@@ -9,6 +9,7 @@ import java.util.List;
 @Service
 public class RecommendationService implements RecommendationServiceRepository {
 
+
     private  final RecommendationServiceRepository repository;
 
     public RecommendationService(RecommendationServiceRepository repository) {
@@ -17,6 +18,8 @@ public class RecommendationService implements RecommendationServiceRepository {
 
     @Override
     public List<Recommendation> findAllRecommendations(Long id) {
+        // код с отработкой ошибок
+
         return repository.findAllRecommendations(id);
     }
 

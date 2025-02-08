@@ -8,7 +8,7 @@ import java.util.Objects;
 @Getter
 public class Recommendation {
     @Id
-    Long id;
+    private Long id;
 
     @Override
     public boolean equals(Object o) {
