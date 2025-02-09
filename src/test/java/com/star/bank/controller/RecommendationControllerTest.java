@@ -4,7 +4,6 @@ import com.star.bank.exception.UserNotFoundException;
 import com.star.bank.model.MockProduct;
 import com.star.bank.model.PersonalRecommendationDto;
 import com.star.bank.service.RecommendationService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +32,6 @@ class RecommendationControllerTest {
     @InjectMocks
     RecommendationController recommendationController;
 
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void test_getUserId_whenRecommendationsExist() throws Exception {
@@ -78,6 +74,6 @@ class RecommendationControllerTest {
 
         mockMvc.perform(get("/recommendation/" + userId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }
