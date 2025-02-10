@@ -14,7 +14,6 @@ public class RecommendationRepository {
     }
 
     public boolean checkProductRules(String userId, String query) {
-        Boolean result = jdbcTemplate.queryForObject(query, Boolean.class, userId);
-        return Boolean.TRUE.equals(result);
+        return jdbcTemplate.query(query, rs -> rs.next() && rs.getBoolean(1), userId);
     }
 }
