@@ -6,18 +6,23 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "recommendations")
 @ToString
 public class PersonalRecommendationDto {
     private String userId;
-    private List<Product> recommendations;
+    private final List<Product> recommendations = new ArrayList<>();
 
-    public PersonalRecommendationDto(String userId, List<Product> recommendations) {
+    public PersonalRecommendationDto(String userId) {
         this.userId = userId;
-        this.recommendations = recommendations;
+
     }
+    public void addRecommendation(Product product) {
+        this.recommendations.add(product);
+    }
+
 }
