@@ -1,9 +1,8 @@
 package com.star.bank.service;
 
-import org.springframework.stereotype.Component;
 import java.util.Set;
 
-@Component
+
 public class SimpleCreditProduct implements Product {
     private final String name = "Простой кредит";
     private final String id = "ab138afb-f3ba-4a93-b74f-0fcee86d447f";
@@ -13,12 +12,13 @@ public class SimpleCreditProduct implements Product {
         this.rules = rules;
     }
 
+
     @Override
     public String getQuery() {
-        return "SELECT 1 FROM transactions t " +
-                "JOIN products p ON t.product_id = p.id " +
-                "WHERE p.type = 'CREDIT' AND t.user_id = ? " +
-                "LIMIT 1";
+        return rules.stream()
+                .map(Rule::getSubQuery)
+                .reduce((a, b) -> a + " AND " + b)
+                .orElse("1=1");
     }
 
 
