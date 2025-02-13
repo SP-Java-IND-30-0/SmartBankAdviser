@@ -26,7 +26,7 @@ public class RecommendationService {
                 recommendationProduct.add(pr);
             }
         }
-        
+
         return new PersonalRecommendationDto(userId,recommendationProduct);
     }
 
