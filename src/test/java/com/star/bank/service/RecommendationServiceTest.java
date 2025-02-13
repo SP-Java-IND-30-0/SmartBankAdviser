@@ -1,9 +1,9 @@
 package com.star.bank.service;
 
 
-import com.star.bank.PersonalRecommendationDto;
-import com.star.bank.Product;
-import com.star.bank.RecommendationRepository;
+import com.star.bank.model.dto.PersonalRecommendationDto;
+import com.star.bank.model.product.Product;
+import com.star.bank.repositories.RecommendationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

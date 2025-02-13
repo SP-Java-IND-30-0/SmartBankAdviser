@@ -1,16 +1,21 @@
 package com.star.bank.model.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.star.bank.model.rule.Rule;
 import com.star.bank.utils.Literals;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
-
+@Component
 public class TopSavingProduct implements Product {
+    @Getter
     private final String name = "Top Saving";
+    @Getter
     private final String id = "59efc529-2fff-41af-baff-90ccd7402925";
     private final Set<Rule> rules = new HashSet<>();
 
@@ -22,7 +27,7 @@ public class TopSavingProduct implements Product {
         rules.add(rule3);
     }
 
-
+    @JsonIgnore
     @Override
     public String getQuery() {
         StringJoiner joiner = new StringJoiner(" AND ", Literals.QUERY_PREFIX, Literals.QUERY_SUFFIX);
@@ -30,6 +35,7 @@ public class TopSavingProduct implements Product {
         return joiner.toString();
     }
 
+    @Getter
     private final String text = """
             Откройте свою собственную «Копилку» с нашим банком! «Копилка» — это уникальный банковский инструмент,
             который поможет вам легко и удобно накапливать деньги на важные цели. Больше никаких забытых чеков и

@@ -1,16 +1,21 @@
 package com.star.bank.model.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.star.bank.model.rule.Rule;
 import com.star.bank.utils.Literals;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
-
+@Component
 public class SimpleCreditProduct implements Product {
+    @Getter
     private final String name = "Простой кредит";
+    @Getter
     private final String id = "ab138afb-f3ba-4a93-b74f-0fcee86d447f";
     private final Set<Rule> rules = new HashSet<>();
 
@@ -23,6 +28,7 @@ public class SimpleCreditProduct implements Product {
     }
 
 
+    @JsonIgnore
     @Override
     public String getQuery() {
         StringJoiner joiner = new StringJoiner(" AND ", Literals.QUERY_PREFIX, Literals.QUERY_SUFFIX);
@@ -30,7 +36,7 @@ public class SimpleCreditProduct implements Product {
         return joiner.toString();
     }
 
-
+    @Getter
     private final String text = """
             Откройте мир выгодных кредитов с нами!
             Ищете способ быстро и без лишних хлопот получить нужную сумму?

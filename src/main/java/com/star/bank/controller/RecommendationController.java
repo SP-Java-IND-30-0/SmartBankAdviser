@@ -1,11 +1,11 @@
 package com.star.bank.controller;
 
+import com.star.bank.model.dto.PersonalRecommendationDto;
+import com.star.bank.service.RecommendationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.star.bank.model.PersonalRecommendationDto;
-import com.star.bank.service.RecommendationService;
 
 @RestController
 @RequestMapping("/recommendation")
