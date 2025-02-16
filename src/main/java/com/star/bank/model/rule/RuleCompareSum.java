@@ -40,12 +40,13 @@ public class RuleCompareSum extends RuleArguments {
         } catch (IllegalArgumentException e) {
             throw new InvalidQueryArgumentsException(QueryType.TRANSACTION_SUM_COMPARE, arguments);
         }
-
     }
 
     @Override
     public String getSubQuery() {
-        return "";
+
+        return  String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = '%s' THEN T.AMOUNT ELSE 0 END) %s %d",
+                productType.name(),operationType.name(),compareType.name(),amount);
     }
 
     @Override

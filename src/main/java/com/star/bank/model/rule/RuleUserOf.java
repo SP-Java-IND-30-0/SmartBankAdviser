@@ -39,7 +39,7 @@ public class RuleUserOf extends RuleArguments {
 
     @Override
     public String getSubQuery() {
-        return "";
+        return String.format("COUNT(CASE WHEN P.TYPE = '%s' THEN 1 END) > 0", productType.name());
     }
 
     @Override

@@ -25,6 +25,6 @@ public class SimpleRule implements Rule {
 
     @Override
     public String getSubQuery() {
-        return "";
+        return negate ? arguments.getSubQuery() : "NOT " + arguments.getSubQuery();
     }
 }

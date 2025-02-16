@@ -1,10 +1,12 @@
 package com.star.bank.model.product;
 
 import com.star.bank.model.rule.SimpleRule;
+import com.star.bank.utils.Literals;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +27,8 @@ public class DynamicRule implements Product {
 
     @Override
     public String getQuery() {
-        return "";
+        StringJoiner joiner = new StringJoiner(" AND ", Literals.QUERY_PREFIX, Literals.QUERY_SUFFIX);
+        rules.forEach(rule -> joiner.add(rule.getSubQuery()));
+        return joiner.toString();
     }
 }

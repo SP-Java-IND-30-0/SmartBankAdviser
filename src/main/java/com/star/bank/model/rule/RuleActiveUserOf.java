@@ -1,5 +1,6 @@
 package com.star.bank.model.rule;
 
+import com.star.bank.config.AppConfig;
 import com.star.bank.exception.InvalidQueryArgumentsException;
 import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.QueryType;
@@ -38,7 +39,8 @@ public class RuleActiveUserOf extends RuleArguments {
 
     @Override
     public String getSubQuery() {
-        return "";
+        return String.format("COUNT(CASE WHEN P.TYPE = '%s' THEN 1 END) > %d",
+                productType.name(), AppConfig.getActiveUserTransaction());
     }
 
     @Override
