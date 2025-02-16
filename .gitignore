@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### H2 Database ###
+src/main/resources/db/transaction.mv.db
+src/main/resources/db/transaction.trace.db
