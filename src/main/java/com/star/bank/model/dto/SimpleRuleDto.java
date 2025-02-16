@@ -2,9 +2,11 @@ package com.star.bank.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.star.bank.model.enums.QueryType;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class SimpleRuleDto {
 
     @JsonProperty("query")

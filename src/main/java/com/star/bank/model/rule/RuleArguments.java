@@ -2,6 +2,8 @@ package com.star.bank.model.rule;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "rule_arguments")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -21,4 +23,6 @@ public abstract class RuleArguments implements Rule {
 
         }
     }
+
+    public abstract List<String> convertToList();
 }

@@ -2,11 +2,13 @@ package com.star.bank.model.product;
 
 import com.star.bank.model.rule.SimpleRule;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Data
 public class DynamicRule implements Product {
 
     @Id
