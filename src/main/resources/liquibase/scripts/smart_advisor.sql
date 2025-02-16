@@ -109,3 +109,21 @@ create table public.dynamic_rules_simple_rules
     constraint pk_dynamic_rules_simple_rules
         primary key (product_id, rule_id)
 );
+
+
+-- changeset belousoveu:6
+alter table public.rule_compare_sum
+add constraint unique_rule_compare_sum_attributes
+unique (product_type, amount, compare_type, operation_type);
+
+alter table public.rule_compare_operation_sum
+add constraint unique_rule_compare_operation_sum_attributes
+unique (product_type, compare_type);
+
+alter table public.rule_user_of
+add constraint unique_rule_user_of_attributes
+unique (product_type);
+
+alter table public.rule_active_user_of
+add constraint unique_rule_active_user_of_attributes
+unique (product_type);

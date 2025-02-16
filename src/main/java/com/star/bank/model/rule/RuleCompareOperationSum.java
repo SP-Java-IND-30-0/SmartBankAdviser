@@ -7,13 +7,15 @@ import com.star.bank.model.enums.QueryType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.*;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "rule_compare_operation_sum")
+@Table(name = "rule_compare_operation_sum",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_type", "compare_type"}))
 @DiscriminatorValue("TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW")
 @Data
 @Builder

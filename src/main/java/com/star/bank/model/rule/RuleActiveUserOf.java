@@ -7,6 +7,7 @@ import com.star.bank.model.enums.QueryType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,8 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "rule_active_user_of")
+@Table(name = "rule_active_user_of",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_type"}))
 @DiscriminatorValue("ACTIVE_USER_OF")
 @Data
 @NoArgsConstructor

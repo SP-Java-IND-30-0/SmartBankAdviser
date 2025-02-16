@@ -8,13 +8,15 @@ import com.star.bank.model.enums.QueryType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.*;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "rule_compare_sum")
+@Table(name = "rule_compare_sum",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_type", "operation_type", "compare_type", "amount"}))
 @DiscriminatorValue("TRANSACTION_SUM_COMPARE")
 @Data
 @Builder
@@ -45,8 +47,8 @@ public class RuleCompareSum extends RuleArguments {
     @Override
     public String getSubQuery() {
 
-        return  String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = '%s' THEN T.AMOUNT ELSE 0 END) %s %d",
-                productType.name(),operationType.name(),compareType.name(),amount);
+        return String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = '%s' THEN T.AMOUNT ELSE 0 END) %s %d",
+                productType.name(), operationType.name(), compareType.name(), amount);
     }
 
     @Override
