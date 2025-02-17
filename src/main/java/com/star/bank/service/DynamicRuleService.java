@@ -55,6 +55,8 @@ public class DynamicRuleService implements DynamicRuleRepository {
             throw new IllegalArgumentException();
         }
 
+        // TODO добавить дополнительные логические проверки
+
         try {
             DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
             dynamicRuleRepository.save(dynamicRule);
