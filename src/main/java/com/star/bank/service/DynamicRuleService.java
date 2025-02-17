@@ -1,16 +1,15 @@
 package com.star.bank.service;
 
+import com.star.bank.exception.*;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.product.DynamicRule;
-import com.star.bank.exception.InvalidProductIdException;
-import com.star.bank.exception.ProductNotFoundException;
-import com.star.bank.exception.DatabaseSaveException;
-import com.star.bank.exception.DatabaseAccessException;
 import com.star.bank.repositories.DynamicRuleRepository;
-import jakarta.persistence.EntityNotFoundException;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +28,7 @@ public class DynamicRuleService implements DynamicRuleRepository {
         this.dynamicRuleMapper = dynamicRuleMapper;
     }
 
+    @Transactional
     public void deleteDynamicRule(String productId) {
         UUID uuid;
         try {
@@ -37,42 +37,39 @@ public class DynamicRuleService implements DynamicRuleRepository {
             }
             uuid = UUID.fromString(productId);
         } catch (IllegalArgumentException e) {
-            throw new InvalidProductIdException(productId);
+            throw new InvalidProductIdException(productId, e);
         }
 
         try {
             dynamicRuleRepository.deleteById(uuid);
         } catch (EmptyResultDataAccessException e) {
-            throw new ProductNotFoundException(uuid);
+            throw new ProductNotFoundException(uuid, e);
+        } catch (DataAccessException e) {
+            throw new DatabaseAccessException(productId, e);
         }
     }
 
+    @Transactional
     public void saveDynamicRule(DynamicRuleDto dynamicRuleDto) {
-        try {
-            if (dynamicRuleDto == null) {
-                throw new IllegalArgumentException();
-            }
+        if (dynamicRuleDto == null) {
+            throw new IllegalArgumentException();
+        }
 
+        try {
             DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
             dynamicRuleRepository.save(dynamicRule);
-
-        } catch (IllegalArgumentException e) {
-            throw e;
-
+        } catch (ConstraintViolationException e) {
+            throw new DuplicateRuleException(e.getMessage(), e);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidRuleDataException(e);
         } catch (DataAccessException e) {
             throw new DatabaseSaveException(e);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
     public List<DynamicRuleDto> getDynamicRules() {
         try {
             List<DynamicRule> dynamicRules = dynamicRuleRepository.findAll();
-            if (dynamicRules.isEmpty()) {
-                return new ArrayList<>();
-            }
 
             List<DynamicRuleDto> dynamicRuleDtos = new ArrayList<>();
             for (DynamicRule dynamicRule : dynamicRules) {
@@ -84,11 +81,6 @@ public class DynamicRuleService implements DynamicRuleRepository {
         } catch (DataAccessException e) {
             throw new DatabaseAccessException(e);
 
-        } catch (EntityNotFoundException e) {
-            throw e;
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }
