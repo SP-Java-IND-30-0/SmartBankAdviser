@@ -14,9 +14,9 @@ import java.util.StringJoiner;
 @Component
 public class TopSavingProduct implements Product {
     @Getter
-    private final String name = "Top Saving";
-    @Getter
     private final String id = "59efc529-2fff-41af-baff-90ccd7402925";
+    @Getter
+    private final String name = "Top Saving";
     private final Set<Rule> rules = new HashSet<>();
 
     public TopSavingProduct(@Qualifier("hasDebitTypeProduct") Rule rule1,

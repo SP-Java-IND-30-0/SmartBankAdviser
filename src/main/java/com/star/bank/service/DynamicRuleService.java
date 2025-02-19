@@ -5,7 +5,6 @@ import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.repositories.DynamicRuleRepository;
-
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
@@ -13,12 +12,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
-public class DynamicRuleService implements DynamicRuleRepository {
+public class DynamicRuleService {
 
     private final DynamicRuleRepository dynamicRuleRepository;
     private final DynamicRuleMapper dynamicRuleMapper;

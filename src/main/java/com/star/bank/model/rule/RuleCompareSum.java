@@ -5,10 +5,7 @@ import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.CompareType;
 import com.star.bank.model.enums.OperationType;
 import com.star.bank.model.enums.QueryType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -24,8 +21,11 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleCompareSum extends RuleArguments {
 
+    @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
+    @Enumerated(EnumType.ORDINAL)
     private OperationType operationType;
+    @Enumerated(EnumType.ORDINAL)
     private CompareType compareType;
     private int amount;
 
@@ -48,7 +48,7 @@ public class RuleCompareSum extends RuleArguments {
     public String getSubQuery() {
 
         return String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = '%s' THEN T.AMOUNT ELSE 0 END) %s %d",
-                productType.name(), operationType.name(), compareType.name(), amount);
+                productType.name(), operationType.name(), compareType.getValue(), amount);
     }
 
     @Override
