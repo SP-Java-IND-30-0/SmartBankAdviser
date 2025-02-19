@@ -113,17 +113,23 @@ create table public.dynamic_rules_simple_rules
 
 -- changeset belousoveu:6
 alter table public.rule_compare_sum
-add constraint unique_rule_compare_sum_attributes
-unique (product_type, amount, compare_type, operation_type);
+    add constraint unique_rule_compare_sum_attributes
+        unique (product_type, amount, compare_type, operation_type);
 
 alter table public.rule_compare_operation_sum
-add constraint unique_rule_compare_operation_sum_attributes
-unique (product_type, compare_type);
+    add constraint unique_rule_compare_operation_sum_attributes
+        unique (product_type, compare_type);
 
 alter table public.rule_user_of
-add constraint unique_rule_user_of_attributes
-unique (product_type);
+    add constraint unique_rule_user_of_attributes
+        unique (product_type);
 
 alter table public.rule_active_user_of
-add constraint unique_rule_active_user_of_attributes
-unique (product_type);
+    add constraint unique_rule_active_user_of_attributes
+        unique (product_type);
+
+-- changeset belousoveu:7
+alter table public.rule_arguments
+    alter column query_type type varchar(50) using query_type::varchar(50);
+
+alter table rule_arguments drop column if exists simple_rule_id;

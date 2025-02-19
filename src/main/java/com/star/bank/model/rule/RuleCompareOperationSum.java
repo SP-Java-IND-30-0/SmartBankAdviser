@@ -4,10 +4,7 @@ import com.star.bank.exception.InvalidQueryArgumentsException;
 import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.CompareType;
 import com.star.bank.model.enums.QueryType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -23,7 +20,9 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleCompareOperationSum extends RuleArguments {
 
+    @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
+    @Enumerated(EnumType.ORDINAL)
     private CompareType compareType;
 
     public RuleCompareOperationSum(List<String> arguments) {

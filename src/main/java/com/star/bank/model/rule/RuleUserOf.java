@@ -3,10 +3,7 @@ package com.star.bank.model.rule;
 import com.star.bank.exception.InvalidQueryArgumentsException;
 import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.QueryType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleUserOf extends RuleArguments {
 
+    @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
 
     public RuleUserOf(List<String> arguments) {
