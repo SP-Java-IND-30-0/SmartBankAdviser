@@ -43,7 +43,7 @@ public class RuleCompareOperationSum extends RuleArguments {
     public String getSubQuery() {
 
         return String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'DEPOSIT' THEN T.AMOUNT ELSE 0 END)" +
-                " %s SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'WITHDRAW' THEN T.AMOUNT ELSE 0 END)",
+                        " %s SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'WITHDRAW' THEN T.AMOUNT ELSE 0 END)",
                 productType.name(), compareType.getValue(), productType.name());
     }
 

@@ -17,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "rule_user_of",
-uniqueConstraints = @UniqueConstraint(columnNames = {"product_type"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_type"}))
 @DiscriminatorValue("USER_OF")
 @Data
 @NoArgsConstructor
