@@ -19,6 +19,10 @@ jacoco {
     reportsDirectory = layout.buildDirectory.dir('JacocoReportDir')
 }
 
+springBoot {
+    buildInfo()
+}
+
 jacocoTestReport {
     reports {
         xml.required = false
