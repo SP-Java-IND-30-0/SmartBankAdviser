@@ -34,9 +34,9 @@ public class RecommendationRepository {
         return jdbcTemplate.query("SELECT * FROM users WHERE username = ?",
                 (rs, rowNum) -> UserDto.builder()
                         .id(rs.getString("id"))
-                        .username("username")
-                        .lastName("last_name")
-                        .firstName("first_name")
+                        .username(rs.getString("username"))
+                        .lastName(rs.getString("last_name"))
+                        .firstName(rs.getString("first_name"))
                         .build(),
                 username);
     }
