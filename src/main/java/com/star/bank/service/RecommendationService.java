@@ -1,7 +1,11 @@
 package com.star.bank.service;
 
+import com.star.bank.exception.UserNotFoundException;
+import com.star.bank.exception.UsernameNotFoundException;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.PersonalRecommendationDto;
+import com.star.bank.model.dto.PersonalRecommendationTgDto;
+import com.star.bank.model.dto.UserDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.model.product.Product;
 import com.star.bank.repositories.RecommendationRepository;
@@ -26,6 +30,11 @@ public class RecommendationService {
     }
 
     public PersonalRecommendationDto sendRecommendation(String userId) {
+
+        if (!repository.isUserExist(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
         addDynamicRules();
         PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
 
@@ -37,6 +46,19 @@ public class RecommendationService {
         return dto;
     }
 
+    public PersonalRecommendationTgDto sendRecommendationTg(String username) {
+        List<UserDto> users = repository.getUser(username);
+        if (users == null || users.size() != 1) {
+            throw new UsernameNotFoundException(username);
+        }
+        PersonalRecommendationDto dto = sendRecommendation(users.get(0).getId());
+        return PersonalRecommendationTgDto.builder()
+                .firstName(users.get(0).getFirstName())
+                .lastName(users.get(0).getLastName())
+                .recommendations(dto.getRecommendations())
+                .build();
+    }
+
     private void addDynamicRules() {
         List<DynamicRule> dynamicRuleList = dynamicRuleService.getDynamicRules()
                 .stream()
@@ -44,5 +66,4 @@ public class RecommendationService {
                 .toList();
         products.addAll(dynamicRuleList);
     }
-
 }
