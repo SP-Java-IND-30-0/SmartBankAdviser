@@ -50,7 +50,6 @@ public class RecommendationRepositoryCacheTest {
     }
 
     @Test
-    @DirtiesContext
     void testCachePerformance() {
         long startTimeFirstRequest = System.currentTimeMillis();
         Boolean firstResult = recommendationRepository.checkProductRules(USER_ID_2, QUERY);
