@@ -1,5 +1,0 @@
-spring:
-  cache:
-    cache-names: userProductRulesCache
-    caffeine:
-      spec: maximumSize=10000,expireAfterWrite=600s
