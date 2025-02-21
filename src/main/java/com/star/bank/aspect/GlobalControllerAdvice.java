@@ -22,13 +22,13 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(DatabaseAccessException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public String handleDatabaseAccessException(DatabaseAccessException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(DatabaseSaveException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public String handleDatabaseSaveException(DatabaseSaveException ex) {
         return ex.getMessage();
     }
