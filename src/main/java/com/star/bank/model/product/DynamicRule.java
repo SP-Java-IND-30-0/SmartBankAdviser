@@ -38,4 +38,19 @@ public class DynamicRule implements Product {
         rules.forEach(rule -> joiner.add(rule.getSubQuery()));
         return joiner.toString();
     }
+
+    @Override
+    public String getName() {
+        return productName;
+    }
+
+    @Override
+    public String getId() {
+        return productId.toString();
+    }
+
+    @Override
+    public String getText() {
+        return productText;
+    }
 }
