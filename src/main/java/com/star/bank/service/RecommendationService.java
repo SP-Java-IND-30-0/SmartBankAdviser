@@ -49,14 +49,6 @@ public class RecommendationService {
         return dto;
     }
 
-    private void addDynamicRules() {
-        List<DynamicRule> dynamicRuleList = dynamicRuleService.getDynamicRules()
-                .stream()
-                .map(dynamicRuleMapper::toEntity)
-                .toList();
-        products.addAll(dynamicRuleList);
-    }
-
     public PersonalRecommendationTgDto sendRecommendationTg(String username) {
         List<UserDto> users = repository.getUser(username);
         if (users == null || users.size() != 1) {
@@ -68,5 +60,13 @@ public class RecommendationService {
                 .lastName(users.get(0).getLastName())
                 .recommendations(dto.getRecommendations())
                 .build();
+    }
+
+    private void addDynamicRules() {
+        List<DynamicRule> dynamicRuleList = dynamicRuleService.getDynamicRules()
+                .stream()
+                .map(dynamicRuleMapper::toEntity)
+                .toList();
+        products.addAll(dynamicRuleList);
     }
 }
