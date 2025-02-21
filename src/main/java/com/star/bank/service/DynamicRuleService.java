@@ -6,7 +6,6 @@ import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.repositories.DynamicRuleRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -59,8 +58,6 @@ public class DynamicRuleService {
         try {
             DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
             dynamicRuleRepository.save(dynamicRule);
-        } catch (ConstraintViolationException e) {
-            throw new DuplicateRuleException(e.getMessage(), e);
         } catch (DataIntegrityViolationException e) {
             throw new InvalidRuleDataException(e);
         } catch (DataAccessException e) {
