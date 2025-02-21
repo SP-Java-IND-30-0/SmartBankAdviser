@@ -33,27 +33,13 @@ public class GlobalControllerAdvice {
         return ex.getMessage();
     }
 
-    @ExceptionHandler(DuplicateRuleException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleDuplicateRuleException(DuplicateRuleException ex) {
-        return ex.getMessage();
-    }
-
-    @ExceptionHandler(InvalidProductIdException.class)
+    @ExceptionHandler({
+            InvalidProductIdException.class,
+            InvalidQueryArgumentsException.class,
+            InvalidRuleDataException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidProductIdException(InvalidProductIdException ex) {
-        return ex.getMessage();
-    }
-
-    @ExceptionHandler(InvalidQueryArgumentsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidQueryArgumentsException(InvalidQueryArgumentsException ex) {
-        return ex.getMessage();
-    }
-
-    @ExceptionHandler(InvalidRuleDataException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidRuleDataException(InvalidRuleDataException ex) {
+    public String handleBadRequestExceptions(RuntimeException ex) {
         return ex.getMessage();
     }
 }
