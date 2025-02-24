@@ -27,6 +27,7 @@ public class RecommendationRepository {
 
     public List<UUID> getAllUserIds() {
         return jdbcTemplate.queryForList("SELECT id FROM users", UUID.class);
+    }
 
     public boolean isUserExist(String userId) {
         return Boolean.TRUE.equals(

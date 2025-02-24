@@ -50,6 +50,7 @@ public class RecommendationService {
 
     public List<UUID> getAllUserIds() {
         return repository.getAllUserIds();
+    }
       
     public PersonalRecommendationTgDto sendRecommendationTg(String username) {
         List<UserDto> users = repository.getUser(username);
