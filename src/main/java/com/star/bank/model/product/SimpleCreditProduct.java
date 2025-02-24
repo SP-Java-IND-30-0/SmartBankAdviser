@@ -14,9 +14,9 @@ import java.util.StringJoiner;
 @Component
 public class SimpleCreditProduct implements Product {
     @Getter
-    private final String name = "Простой кредит";
-    @Getter
     private final String id = "ab138afb-f3ba-4a93-b74f-0fcee86d447f";
+    @Getter
+    private final String name = "Простой кредит";
     private final Set<Rule> rules = new HashSet<>();
 
     public SimpleCreditProduct(@Qualifier("hasNotCreditTypeProduct") Rule rule1,

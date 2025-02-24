@@ -1,7 +1,14 @@
+package com.star.bank.controller;
+
+import com.star.bank.model.dto.DynamicRuleDto;
+import com.star.bank.service.DynamicRuleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -19,7 +26,7 @@ public class DynamicRuleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DynamicRuleDto>> getDynamicRules() {;
+    public ResponseEntity<List<DynamicRuleDto>> getDynamicRules() {
         List<DynamicRuleDto> rules = dynamicRuleService.getDynamicRules();
         return ResponseEntity.ok(rules);
     }

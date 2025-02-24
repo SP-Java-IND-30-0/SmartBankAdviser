@@ -15,9 +15,9 @@ import java.util.StringJoiner;
 @Component
 public class Invest500Product implements Product {
     @Getter
-    private final String name = "Invest 500";
-    @Getter
     private final String id = "147f6a0f-3b91-413b-ab99-87f081d60d5a";
+    @Getter
+    private final String name = "Invest 500";
     private final Set<Rule> rules = new HashSet<>();
 
     public Invest500Product(@Qualifier("hasDebitTypeProduct") Rule rule1,

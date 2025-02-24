@@ -4,10 +4,7 @@ import com.star.bank.exception.InvalidQueryArgumentsException;
 import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.CompareType;
 import com.star.bank.model.enums.QueryType;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -23,7 +20,9 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleCompareOperationSum extends RuleArguments {
 
+    @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
+    @Enumerated(EnumType.ORDINAL)
     private CompareType compareType;
 
     public RuleCompareOperationSum(List<String> arguments) {
@@ -43,7 +42,7 @@ public class RuleCompareOperationSum extends RuleArguments {
     public String getSubQuery() {
 
         return String.format("SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'DEPOSIT' THEN T.AMOUNT ELSE 0 END)" +
-                " %s SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'WITHDRAW' THEN T.AMOUNT ELSE 0 END)",
+                        " %s SUM(CASE WHEN P.TYPE = '%s' AND T.TYPE = 'WITHDRAW' THEN T.AMOUNT ELSE 0 END)",
                 productType.name(), compareType.getValue(), productType.name());
     }
 

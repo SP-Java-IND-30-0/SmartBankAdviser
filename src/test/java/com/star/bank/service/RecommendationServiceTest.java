@@ -1,6 +1,7 @@
 package com.star.bank.service;
 
 
+import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.PersonalRecommendationDto;
 import com.star.bank.model.product.Product;
 import com.star.bank.repositories.RecommendationRepository;
@@ -24,13 +25,17 @@ class RecommendationServiceTest {
 
     @Mock
     private RecommendationRepository recommendationRepository;
+    @Mock
+    private DynamicRuleService dynamicRuleService;
+    @Mock
+    private DynamicRuleMapper dynamicRuleMapper;
     private RecommendationService service;
     Set<Product> products = new HashSet<>();
 
     @BeforeEach
     void info(){
         recommendationRepository = mock(RecommendationRepository.class);
-        service = new RecommendationService(recommendationRepository,products);
+        service = new RecommendationService(recommendationRepository,dynamicRuleService, dynamicRuleMapper, products);
 
         products.add(() -> "firstProduct");
         products.add(() -> "secondProduct");
