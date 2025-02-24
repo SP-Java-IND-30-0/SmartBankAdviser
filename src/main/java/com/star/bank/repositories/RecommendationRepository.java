@@ -5,6 +5,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.UUID;
+
 @Repository
 public class RecommendationRepository {
 
@@ -16,6 +19,10 @@ public class RecommendationRepository {
 
     @Cacheable(value = "userProductRulesCache", key = "#userId + '_' + #query")
     public boolean checkProductRules(String userId, String query) {
-        return jdbcTemplate.query(query, rs -> rs.next() && rs.getBoolean(1), userId);
+        return Boolean.TRUE.equals(jdbcTemplate.query(query, rs -> rs.next() && rs.getBoolean(1), userId));
+    }
+
+    public List<UUID> getAllUserIds() {
+        return jdbcTemplate.queryForList("SELECT id FROM users", UUID.class);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class RecommendationService {
@@ -35,6 +36,10 @@ public class RecommendationService {
             }
         }
         return dto;
+    }
+
+    public List<UUID> getAllUserIds() {
+        return repository.getAllUserIds();
     }
 
     private void addDynamicRules() {
