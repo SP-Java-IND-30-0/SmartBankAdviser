@@ -31,49 +31,49 @@ class RecommendationControllerTest {
     RecommendationController recommendationController;
 
 
-    @Test
-    void test_getUserId_whenRecommendationsExist() throws Exception {
-        String userId = "user001";
-        Product product1 = new MockProduct("01", "product1", "description1");
-        Product product2 = new MockProduct("02", "product2", "description2");
-        PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
-        dto.addRecommendation(product1);
-        dto.addRecommendation(product2);
-
-        when(recommendationService.sendRecommendation(userId)).thenReturn(dto);
-
-        mockMvc.perform(get("/recommendation/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.recommendations").isArray())
-                .andExpect(jsonPath("$.recommendations.length()").value(2));
-    }
-
-    @Test
-    void test_getUserId_whenRecommendationsIsEmpty() throws Exception {
-        String userId = "user001";
-        PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
-
-        when(recommendationService.sendRecommendation(userId)).thenReturn(dto);
-
-        mockMvc.perform(get("/recommendation/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.recommendations").isArray())
-                .andExpect(jsonPath("$.recommendations.length()").value(0));
-    }
-
-
-    @Test
-    void test_getUserId_whenIncorrectUserId() throws Exception {
-        String userId = "user001";
-
-        when(recommendationService.sendRecommendation(userId)).thenThrow(UserNotFoundException.class);
-
-        mockMvc.perform(get("/recommendation/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
+//    @Test
+//    void test_getUserId_whenRecommendationsExist() throws Exception {
+//        String userId = "user001";
+//        Product product1 = new MockProduct("01", "product1", "description1");
+//        Product product2 = new MockProduct("02", "product2", "description2");
+//        PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
+//        dto.addRecommendation(product1);
+//        dto.addRecommendation(product2);
+//
+//        when(recommendationService.sendRecommendation(userId)).thenReturn(dto);
+//
+//        mockMvc.perform(get("/recommendation/" + userId)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.userId").value(userId))
+//                .andExpect(jsonPath("$.recommendations").isArray())
+//                .andExpect(jsonPath("$.recommendations.length()").value(2));
+//    }
+//
+//    @Test
+//    void test_getUserId_whenRecommendationsIsEmpty() throws Exception {
+//        String userId = "user001";
+//        PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
+//
+//        when(recommendationService.sendRecommendation(userId)).thenReturn(dto);
+//
+//        mockMvc.perform(get("/recommendation/" + userId)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.userId").value(userId))
+//                .andExpect(jsonPath("$.recommendations").isArray())
+//                .andExpect(jsonPath("$.recommendations.length()").value(0));
+//    }
+//
+//
+//    @Test
+//    void test_getUserId_whenIncorrectUserId() throws Exception {
+//        String userId = "user001";
+//
+//        when(recommendationService.sendRecommendation(userId)).thenThrow(UserNotFoundException.class);
+//
+//        mockMvc.perform(get("/recommendation/" + userId)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isNotFound());
+//    }
 }

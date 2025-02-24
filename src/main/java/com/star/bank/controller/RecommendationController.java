@@ -6,10 +6,13 @@ import com.star.bank.service.RecommendationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/recommendation")
@@ -26,16 +29,26 @@ public class RecommendationController {
     @Operation(summary = "Получить рекомендации для пользователя по его ID")
     @ApiResponse(responseCode = "200", description = "Получен список подходящих рекомендаций для пользователя")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    public PersonalRecommendationDto getUserId(@PathVariable("user_id") String userId) {
-        return recommendationService.sendRecommendation(userId);
+    public CompletableFuture<ResponseEntity<PersonalRecommendationDto>> getUserId(@PathVariable("user_id") String userId) {
+        return recommendationService.sendRecommendation(userId)
+                .thenApply(ResponseEntity::ok)
+                .exceptionally(e -> {
+                            throw new RuntimeException(e.getCause());
+                        }
+                );
     }
 
     @GetMapping("username/{username}")
     @Operation(summary = "Получить рекомендации для пользователя по значению 'username'")
     @ApiResponse(responseCode = "200", description = "Получен список подходящих рекомендаций для пользователя")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-    public PersonalRecommendationTgDto getUsername(@PathVariable("username") String username) {
-        return recommendationService.sendRecommendationTg(username);
+    public CompletableFuture<ResponseEntity<PersonalRecommendationTgDto>> getUsername(@PathVariable("username") String username) {
+        return recommendationService.sendRecommendationTg(username)
+                .thenApply(ResponseEntity::ok)
+                .exceptionally(e -> {
+                            throw new RuntimeException(e.getCause());
+                        }
+                );
     }
 
 }

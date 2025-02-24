@@ -21,15 +21,15 @@ public class PersonalRecommendationDto {
     private final String userId;
 
     @Schema(description = "Список рекомендаций пользователя")
-    private final List<Product> recommendations = new ArrayList<>();
+    private List<Product> recommendations = new ArrayList<>();
 
     public PersonalRecommendationDto(String userId) {
         this.userId = userId;
 
     }
 
-    public void addRecommendation(Product product) {
-        this.recommendations.add(product);
-    }
+//    public void addRecommendation(Product product) {
+//        this.recommendations.add(product);
+//    }
 
 }
