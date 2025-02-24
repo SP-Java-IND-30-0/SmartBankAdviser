@@ -27,11 +27,17 @@ public class TelegramBotService {
         new Thread(() -> {
             while (true) {
                 try {
-                    for (Update update : bot.execute(new GetUpdates().limit(100).offset(0)).updates()) {
-                        if (update.message() != null) {
-                            handleUpdate(update.message());
+                    GetUpdates getUpdates = new GetUpdates().limit(100).offset(0);
+                    var response = bot.execute(getUpdates);
+                    if (response != null && response.updates() != null) {
+                        for (Update update : response.updates()) {
+                            if (update.message() != null) {
+                                handleUpdate(update.message());
+                            }
                         }
                     }
+
+                    Thread.sleep(1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -50,20 +56,23 @@ public class TelegramBotService {
                 bot.execute(new SendMessage(chatId, "Неверный формат данных. Пожалуйста, введите ФИО в формате: Иванов Иван Иванович или Иванов Иван."));
                 return;
             }
-            String recommendation = botService.getRecommendation(username);
 
+            String[] nameParts = username.split(" ");
+            String greeting = "Здравствуйте, " + String.join(" ", nameParts[0], nameParts[1]);
+            if (nameParts.length == 3) {
+                greeting += " " + nameParts[2];
+            }
+
+            bot.execute(new SendMessage(chatId, greeting));
+
+            String recommendation = botService.getRecommendation(username);
 
             bot.execute(new SendMessage(chatId, recommendation));
         }
     }
 
     private boolean isValidNameFormat(String username) {
-        // Регулярное выражение для проверки ФИО (Форматы: "Иванов Иван Иванович" или "Иванов Иван")
+
         return username.matches("^[А-Яа-яЁё]+\\s[А-Яа-яЁё]+(\\s[А-Яа-яЁё]+)?$");
-
     }
-
-
-
-
 }
