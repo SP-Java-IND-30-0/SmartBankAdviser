@@ -3,6 +3,7 @@ package com.star.bank.scheduler;
 import com.star.bank.event.DbUpdateEvent;
 import com.star.bank.service.RecommendationService;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ public class DbUpdateEventPublisher {
 
     private final RecommendationService recommendationService;
 
+    @Getter
     private List<UUID> userIds;
 
     public DbUpdateEventPublisher(ApplicationEventPublisher eventPublisher, RecommendationService recommendationService) {

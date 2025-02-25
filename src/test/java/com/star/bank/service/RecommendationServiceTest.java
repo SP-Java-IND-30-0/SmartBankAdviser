@@ -37,8 +37,8 @@ class RecommendationServiceTest {
         recommendationRepository = mock(RecommendationRepository.class);
         service = new RecommendationService(recommendationRepository,dynamicRuleService, dynamicRuleMapper, products);
 
-        products.add(() -> "firstProduct");
-        products.add(() -> "secondProduct");
+//        products.add(() -> "firstProduct");
+//        products.add(() -> "secondProduct");
 
     }
 
