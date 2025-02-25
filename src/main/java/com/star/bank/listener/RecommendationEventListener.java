@@ -1,4 +1,4 @@
-package com.star.bank.component;
+package com.star.bank.listener;
 
 import com.star.bank.event.DeleteDynamicRuleEvent;
 import com.star.bank.event.SendRecommendationEvent;

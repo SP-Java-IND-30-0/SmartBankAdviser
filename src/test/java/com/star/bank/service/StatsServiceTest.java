@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import java.util.UUID;
 
@@ -42,9 +43,21 @@ class StatsServiceTest {
     @Test
     void testDeleteDynamicRule() {
         UUID ruleId = UUID.randomUUID();
-        statsService.deleteDynamicRule(ruleId);
 
-        StatsDto stats = statsService.getStats();
-        assertThat(stats.getStats()).doesNotContain(new StatsDto.ProductStat(ruleId.toString(), 0));
+        Product mockProduct = mock(Product.class);
+        when(mockProduct.getId()).thenReturn(ruleId.toString());
+
+        SendRecommendationEvent sendEvent = new SendRecommendationEvent(this, mockProduct);
+
+        statsService.incrementProduct(sendEvent);
+
+        StatsDto statsBeforeDelete = statsService.getStats();
+        assertThat(statsBeforeDelete.getStats())
+                .anyMatch(stat -> stat.getRuleId().equals(ruleId.toString()) && stat.getCount() == 1);
+
+        statsService.deleteDynamicRule(ruleId);
+        StatsDto statsAfterDelete = statsService.getStats();
+        assertThat(statsAfterDelete.getStats())
+                .noneMatch(stat -> stat.getRuleId().equals(ruleId.toString()));
     }
 }

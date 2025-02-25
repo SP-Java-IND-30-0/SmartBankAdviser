@@ -1,6 +1,6 @@
 package com.star.bank;
 
-import com.star.bank.component.RecommendationEventListener;
+import com.star.bank.listener.RecommendationEventListener;
 import com.star.bank.event.DeleteDynamicRuleEvent;
 import com.star.bank.event.SendRecommendationEvent;
 import com.star.bank.model.product.Product;

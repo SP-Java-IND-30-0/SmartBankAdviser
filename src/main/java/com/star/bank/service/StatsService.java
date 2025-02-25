@@ -4,6 +4,7 @@ import com.star.bank.event.SendRecommendationEvent;
 import com.star.bank.model.dto.StatsDto;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,6 +28,6 @@ public class StatsService {
         List<StatsDto.ProductStat> stats = ruleCounters.entrySet().stream()
                 .map(entry -> new StatsDto.ProductStat(entry.getKey().toString(), entry.getValue()))
                 .toList();
-        return new StatsDto(stats);
+        return new StatsDto(stats.isEmpty() ? Collections.emptyList() : stats);
     }
 }
