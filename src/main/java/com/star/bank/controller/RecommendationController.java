@@ -38,7 +38,7 @@ public class RecommendationController {
                 );
     }
 
-    @GetMapping("username/{username}")
+    @GetMapping("/username/{username}")
     @Operation(summary = "Получить рекомендации для пользователя по значению 'username'")
     @ApiResponse(responseCode = "200", description = "Получен список подходящих рекомендаций для пользователя")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")

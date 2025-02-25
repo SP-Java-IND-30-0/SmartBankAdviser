@@ -28,8 +28,4 @@ public class PersonalRecommendationDto {
 
     }
 
-//    public void addRecommendation(Product product) {
-//        this.recommendations.add(product);
-//    }
-
 }
