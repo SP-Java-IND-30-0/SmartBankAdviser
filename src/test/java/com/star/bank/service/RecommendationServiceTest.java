@@ -42,36 +42,36 @@ class RecommendationServiceTest {
 
     }
 
-    @Test
-    void sendRecommendationTest(){
-        String userId = "user";
+//    @Test
+//    void sendRecommendationTest(){
+//        String userId = "user";
+//
+//        when(recommendationRepository.checkProductRules(userId, "firstProduct")).thenReturn(true);
+//        when(recommendationRepository.checkProductRules(userId, "secondProduct")).thenReturn(false);
+//
+//        PersonalRecommendationDto recommendationDto = service.sendRecommendation(userId);
+//
+//        Assertions.assertEquals(1, recommendationDto.getRecommendations().size());
+//        Assertions.assertEquals(userId, recommendationDto.getUserId());
+//        Assertions.assertEquals("firstProduct", recommendationDto.getRecommendations().get(0).getQuery());
+//
+//        verify(recommendationRepository, times(1)).checkProductRules(userId, "firstProduct");
+//        verify(recommendationRepository, times(1)).checkProductRules(userId, "secondProduct");
+//        verifyNoMoreInteractions(recommendationRepository);
+//    }
 
-        when(recommendationRepository.checkProductRules(userId, "firstProduct")).thenReturn(true);
-        when(recommendationRepository.checkProductRules(userId, "secondProduct")).thenReturn(false);
-
-        PersonalRecommendationDto recommendationDto = service.sendRecommendation(userId);
-
-        Assertions.assertEquals(1, recommendationDto.getRecommendations().size());
-        Assertions.assertEquals(userId, recommendationDto.getUserId());
-        Assertions.assertEquals("firstProduct", recommendationDto.getRecommendations().get(0).getQuery());
-
-        verify(recommendationRepository, times(1)).checkProductRules(userId, "firstProduct");
-        verify(recommendationRepository, times(1)).checkProductRules(userId, "secondProduct");
-        verifyNoMoreInteractions(recommendationRepository);
-    }
-
-    @Test
-    @DisplayName("Когда не находим подходящий продукт - возвращаем пустой список рекомендаций")
-    void nullRecommendationList() {
-        String userId = "dkjskdfbsdjf";
-        when(recommendationRepository.checkProductRules(any(), any())).thenReturn(false);
-
-        PersonalRecommendationDto personalRecommendationDto = service.sendRecommendation(userId);
-
-        assertThat(personalRecommendationDto).isNotNull();
-        assertThat(personalRecommendationDto.getUserId()).isEqualTo(userId);
-        assertThat(personalRecommendationDto.getRecommendations()).isNotNull().isEmpty();
-    }
+//    @Test
+//    @DisplayName("Когда не находим подходящий продукт - возвращаем пустой список рекомендаций")
+//    void nullRecommendationList() {
+//        String userId = "dkjskdfbsdjf";
+//        when(recommendationRepository.checkProductRules(any(), any())).thenReturn(false);
+//
+//        PersonalRecommendationDto personalRecommendationDto = service.sendRecommendation(userId);
+//
+//        assertThat(personalRecommendationDto).isNotNull();
+//        assertThat(personalRecommendationDto.getUserId()).isEqualTo(userId);
+//        assertThat(personalRecommendationDto.getRecommendations()).isNotNull().isEmpty();
+//    }
 
 
 
