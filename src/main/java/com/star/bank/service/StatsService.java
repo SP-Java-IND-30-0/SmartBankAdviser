@@ -22,14 +22,6 @@ public class StatsService {
     public StatsService(DynamicRuleService dynamicRuleService, Set<Product> products) {
         this.dynamicRuleService = dynamicRuleService;
         this.products = products;
-        initializeRuleCounters();
-    }
-
-    private void initializeRuleCounters() {
-        Set<UUID> allRuleIds = getAllRuleIds();
-        for (UUID ruleId : allRuleIds) {
-            ruleCounters.putIfAbsent(ruleId, 0);
-        }
     }
 
     private Set<UUID> getAllRuleIds() {
@@ -57,10 +49,7 @@ public class StatsService {
     }
 
     public StatsDto getStats() {
-        Set<UUID> allRuleIds = getAllRuleIds();
-        for (UUID ruleId : allRuleIds) {
-            ruleCounters.putIfAbsent(ruleId, 0);
-        }
+        getAllRuleIds().forEach(ruleId -> ruleCounters.putIfAbsent(ruleId, 0));
 
         List<StatsDto.ProductStat> stats = ruleCounters.entrySet().stream()
                 .map(entry -> new StatsDto.ProductStat(entry.getKey().toString(), entry.getValue()))

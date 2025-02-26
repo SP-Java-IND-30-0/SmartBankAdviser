@@ -37,10 +37,6 @@ class RecommendationServiceTest {
 
     Set<Product> products = new HashSet<>();
 
-    RecommendationServiceTest(ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
-
     @BeforeEach
     void info(){
         recommendationRepository = mock(RecommendationRepository.class);
