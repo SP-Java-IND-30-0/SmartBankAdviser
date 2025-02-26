@@ -1,33 +1,52 @@
 package com.star.bank.controller;
 
 import com.star.bank.config.AppConfig;
+import com.star.bank.event.RequestClearCacheEvent;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ManagementController.class)
+@ExtendWith(MockitoExtension.class)
 class ManagementControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     private final String requestPath = "/management";
 
+    @BeforeEach
+    void setup() {
+        ManagementController controller = new ManagementController(publisher);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
     @Test
     void test_clearCaches() throws Exception {
+
+        doNothing().when(publisher).publishEvent(any(RequestClearCacheEvent.class));
 
         mockMvc.perform(post(requestPath + "/clear-caches")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
+
+        verify(publisher, times(1)).publishEvent(any(RequestClearCacheEvent.class));
 
     }
 

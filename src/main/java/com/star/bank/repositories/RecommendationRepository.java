@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
+
 
 @Repository
 public class RecommendationRepository {
@@ -22,6 +24,10 @@ public class RecommendationRepository {
         return Boolean.TRUE.equals(jdbcTemplate.query(query, rs -> rs.next() && rs.getBoolean(1), userId));
     }
 
+
+    public List<UUID> getAllUserIds() {
+        return jdbcTemplate.queryForList("SELECT id FROM users", UUID.class);
+    }
 
     public boolean isUserExist(String userId) {
         return Boolean.TRUE.equals(
@@ -39,5 +45,6 @@ public class RecommendationRepository {
                         .firstName(rs.getString("first_name"))
                         .build(),
                 username);
+
     }
 }
