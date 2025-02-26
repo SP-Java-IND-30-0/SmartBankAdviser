@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import java.util.concurrent.CompletableFuture;
+
 
 @Service
 public class RecommendationService {
@@ -65,7 +67,15 @@ public class RecommendationService {
         return result;
     }
 
+
+
+    public List<UUID> getAllUserIds() {
+        return repository.getAllUserIds();
+    }
+      
+
     public CompletableFuture<PersonalRecommendationTgDto> sendRecommendationTg(String username) {
+
         List<UserDto> users = repository.getUser(username);
         if (users == null || users.size() != 1) {
             throw new UsernameNotFoundException(username);
