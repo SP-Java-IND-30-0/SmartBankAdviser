@@ -1,14 +1,13 @@
 package com.star.bank.controller;
 
+import com.star.bank.MockProduct;
 import com.star.bank.exception.UserNotFoundException;
 import com.star.bank.exception.UsernameNotFoundException;
-import com.star.bank.model.MockProduct;
 import com.star.bank.model.dto.PersonalRecommendationDto;
 import com.star.bank.model.dto.PersonalRecommendationTgDto;
 import com.star.bank.model.product.Product;
 import com.star.bank.service.RecommendationService;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -34,9 +33,6 @@ class RecommendationControllerTest {
 
     @MockitoBean
     private RecommendationService recommendationService;
-
-    @InjectMocks
-    private RecommendationController recommendationController;
 
     @Test
     void test_getUserId_whenRecommendationsExist() throws Exception {
