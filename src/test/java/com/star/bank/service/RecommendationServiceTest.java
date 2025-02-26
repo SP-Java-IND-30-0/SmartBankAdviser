@@ -30,8 +30,11 @@ class RecommendationServiceTest {
     private DynamicRuleService dynamicRuleService;
     @Mock
     private DynamicRuleMapper dynamicRuleMapper;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private RecommendationService service;
-    private final ApplicationEventPublisher eventPublisher;
+
     Set<Product> products = new HashSet<>();
 
     RecommendationServiceTest(ApplicationEventPublisher eventPublisher) {
