@@ -10,6 +10,7 @@ import com.star.bank.model.rule.RuleArguments;
 import com.star.bank.model.rule.RuleUserOf;
 import com.star.bank.model.rule.SimpleRule;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,30 @@ public class TestUtils {
     public static final RuleArguments ACTIVE_USER_OF_CREDIT = new RuleUserOf(BankProductType.CREDIT);
     public static final RuleArguments ACTIVE_USER_OF_SAVING = new RuleUserOf(BankProductType.SAVING);
     public static final RuleArguments ACTIVE_USER_OF_INVEST = new RuleUserOf(BankProductType.INVEST);
+
+    public static final String PRODUCT_ID = "123e4567-e89b-12d3-a456-426614174000";
+    public static final String PRODUCT_NAME = "Test Product";
+    public static final String PRODUCT_TEXT = "Test Recommendation";
+    public static final String RULES_ENDPOINT = "/rule";
+    public static final String STATS_ENDPOINT = "/rule/stats";
+
+    public static String createJsonContent() {
+        return "{" +
+                "\"product_id\": \"" + PRODUCT_ID + "\"," +
+                "\"product_name\": \"" + PRODUCT_NAME + "\"," +
+                "\"product_text\": \"" + PRODUCT_TEXT + "\"," +
+                "\"rule\": []" +
+                "}";
+    }
+
+    public static DynamicRuleDto createDynamicRuleDto() {
+        DynamicRuleDto rule = new DynamicRuleDto();
+        rule.setProductId(UUID.fromString(PRODUCT_ID));
+        rule.setProductName(PRODUCT_NAME);
+        rule.setProductText(PRODUCT_TEXT);
+        rule.setRules(Collections.emptySet());
+        return rule;
+    }
 
     public static TestDynamicRule createTestDynamicRule() {
         return new TestDynamicRule();

@@ -16,11 +16,11 @@ import java.util.UUID;
 public class DynamicRule implements Product {
 
     @Id
-    @JsonProperty("id")
+    @JsonIgnore
     private UUID productId;
-    @JsonProperty("name")
+    @JsonIgnore
     private String productName;
-    @JsonProperty("text")
+    @JsonIgnore
     private String productText;
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
@@ -37,5 +37,23 @@ public class DynamicRule implements Product {
         StringJoiner joiner = new StringJoiner(" AND ", Literals.QUERY_PREFIX, Literals.QUERY_SUFFIX);
         rules.forEach(rule -> joiner.add(rule.getSubQuery()));
         return joiner.toString();
+    }
+
+    @Override
+    @JsonProperty("name")
+    public String getName() {
+        return productName;
+    }
+
+    @Override
+    @JsonProperty("id")
+    public String getId() {
+        return productId.toString();
+    }
+
+    @Override
+    @JsonProperty("text")
+    public String getText() {
+        return productText;
     }
 }
