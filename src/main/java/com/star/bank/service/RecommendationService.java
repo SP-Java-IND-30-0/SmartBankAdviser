@@ -9,10 +9,14 @@ import com.star.bank.model.dto.UserDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.model.product.Product;
 import com.star.bank.repositories.RecommendationRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class RecommendationService {
@@ -29,7 +33,14 @@ public class RecommendationService {
         this.products = products;
     }
 
-    public PersonalRecommendationDto sendRecommendation(String userId) {
+    @Async
+    public CompletableFuture<PersonalRecommendationDto> sendRecommendation(String userId) {
+
+        try {
+            UUID.fromString(userId);
+        } catch (IllegalArgumentException e) {
+            throw new UserNotFoundException(userId);
+        }
 
         if (!repository.isUserExist(userId)) {
             throw new UserNotFoundException(userId);
@@ -38,25 +49,35 @@ public class RecommendationService {
         addDynamicRules();
         PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
 
-        for (Product pr : products) {
-            if (repository.checkProductRules(userId, pr.getQuery())) {
-                dto.addRecommendation(pr);
-            }
-        }
-        return dto;
+        dto.setRecommendations(getRecommendations(userId));
+
+        return CompletableFuture.completedFuture(dto);
     }
 
-    public PersonalRecommendationTgDto sendRecommendationTg(String username) {
+    private List<Product> getRecommendations(String userId) {
+        List<Product> result = new ArrayList<>();
+        addDynamicRules();
+        for (Product pr : products) {
+            if (repository.checkProductRules(userId, pr.getQuery())) {
+                result.add(pr);
+            }
+        }
+        return result;
+    }
+
+    public CompletableFuture<PersonalRecommendationTgDto> sendRecommendationTg(String username) {
         List<UserDto> users = repository.getUser(username);
         if (users == null || users.size() != 1) {
             throw new UsernameNotFoundException(username);
         }
-        PersonalRecommendationDto dto = sendRecommendation(users.get(0).getId());
-        return PersonalRecommendationTgDto.builder()
+
+        PersonalRecommendationTgDto dto = PersonalRecommendationTgDto.builder()
                 .firstName(users.get(0).getFirstName())
                 .lastName(users.get(0).getLastName())
-                .recommendations(dto.getRecommendations())
                 .build();
+        dto.setRecommendations(getRecommendations(users.get(0).getId()));
+
+        return CompletableFuture.completedFuture(dto);
     }
 
     private void addDynamicRules() {
