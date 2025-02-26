@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 
 import java.util.HashSet;
@@ -29,13 +30,17 @@ class RecommendationServiceTest {
     private DynamicRuleService dynamicRuleService;
     @Mock
     private DynamicRuleMapper dynamicRuleMapper;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private RecommendationService service;
+
     Set<Product> products = new HashSet<>();
 
     @BeforeEach
     void info(){
         recommendationRepository = mock(RecommendationRepository.class);
-        service = new RecommendationService(recommendationRepository,dynamicRuleService, dynamicRuleMapper, products);
+        service = new RecommendationService(recommendationRepository, dynamicRuleService, dynamicRuleMapper, eventPublisher, products);
 
 //        products.add(() -> "firstProduct");
 //        products.add(() -> "secondProduct");

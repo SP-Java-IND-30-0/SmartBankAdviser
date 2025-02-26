@@ -1,11 +1,13 @@
 package com.star.bank.service;
 
+import com.star.bank.event.DeleteDynamicRuleEvent;
 import com.star.bank.exception.*;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.repositories.DynamicRuleRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,10 +22,12 @@ public class DynamicRuleService {
 
     private final DynamicRuleRepository dynamicRuleRepository;
     private final DynamicRuleMapper dynamicRuleMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public DynamicRuleService(DynamicRuleRepository dynamicRuleRepository, DynamicRuleMapper dynamicRuleMapper) {
+    public DynamicRuleService(DynamicRuleRepository dynamicRuleRepository, DynamicRuleMapper dynamicRuleMapper, ApplicationEventPublisher eventPublisher) {
         this.dynamicRuleRepository = dynamicRuleRepository;
         this.dynamicRuleMapper = dynamicRuleMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -40,6 +44,7 @@ public class DynamicRuleService {
 
         try {
             dynamicRuleRepository.deleteById(uuid);
+            eventPublisher.publishEvent(new DeleteDynamicRuleEvent(this, uuid));
         } catch (EmptyResultDataAccessException e) {
             throw new ProductNotFoundException(uuid, e);
         } catch (DataAccessException e) {

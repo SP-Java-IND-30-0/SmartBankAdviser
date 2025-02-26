@@ -1,7 +1,9 @@
 package com.star.bank.controller;
 
 import com.star.bank.model.dto.DynamicRuleDto;
+import com.star.bank.model.dto.StatsDto;
 import com.star.bank.service.DynamicRuleService;
+import com.star.bank.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,7 @@ import java.util.List;
 public class DynamicRuleController {
 
     private final DynamicRuleService dynamicRuleService;
+    private final StatsService statsService;
 
     @PostMapping
     @Operation(summary = "Новое динамическое правило для пользователя")
@@ -45,6 +48,14 @@ public class DynamicRuleController {
     @ApiResponse(responseCode = "404", description = "Ресурс не найден на сервере")
     public ResponseEntity<Void> deleteDynamicRule(@PathVariable String ruleId) {
         dynamicRuleService.deleteDynamicRule(ruleId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "Получить статистику срабатывания правил рекомендаций")
+    @ApiResponse(responseCode = "200", description = "Запрос успешно обработан")
+    public ResponseEntity<StatsDto> getStats() {
+        StatsDto stats = statsService.getStats();
+        return ResponseEntity.ok(stats);
     }
 }

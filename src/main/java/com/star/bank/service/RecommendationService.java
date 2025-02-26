@@ -1,5 +1,6 @@
 package com.star.bank.service;
 
+import com.star.bank.event.SendRecommendationEvent;
 import com.star.bank.exception.UserNotFoundException;
 import com.star.bank.exception.UsernameNotFoundException;
 import com.star.bank.mapper.DynamicRuleMapper;
@@ -9,7 +10,11 @@ import com.star.bank.model.dto.UserDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.model.product.Product;
 import com.star.bank.repositories.RecommendationRepository;
+
+import org.springframework.context.ApplicationEventPublisher;
+
 import org.springframework.scheduling.annotation.Async;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,15 +30,18 @@ public class RecommendationService {
     private final RecommendationRepository repository;
     private final DynamicRuleService dynamicRuleService;
     private final DynamicRuleMapper dynamicRuleMapper;
+    private final ApplicationEventPublisher eventPublisher;
     private final Set<Product> products;
 
 
-    public RecommendationService(RecommendationRepository repository, DynamicRuleService dynamicRuleService, DynamicRuleMapper dynamicRuleMapper, Set<Product> products) {
+    public RecommendationService(RecommendationRepository repository, DynamicRuleService dynamicRuleService, DynamicRuleMapper dynamicRuleMapper, ApplicationEventPublisher eventPublisher, Set<Product> products) {
         this.repository = repository;
         this.dynamicRuleService = dynamicRuleService;
         this.dynamicRuleMapper = dynamicRuleMapper;
+        this.eventPublisher = eventPublisher;
         this.products = products;
     }
+
 
     @Async
     public CompletableFuture<PersonalRecommendationDto> sendRecommendation(String userId) {
@@ -47,7 +55,6 @@ public class RecommendationService {
         if (!repository.isUserExist(userId)) {
             throw new UserNotFoundException(userId);
         }
-
         addDynamicRules();
         PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
 
@@ -61,7 +68,10 @@ public class RecommendationService {
         addDynamicRules();
         for (Product pr : products) {
             if (repository.checkProductRules(userId, pr.getQuery())) {
+
                 result.add(pr);
+                eventPublisher.publishEvent(new SendRecommendationEvent(this, pr));
+
             }
         }
         return result;
