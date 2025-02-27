@@ -5,30 +5,30 @@ import com.star.bank.exception.*;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.product.DynamicRule;
+import com.star.bank.model.rule.RuleArguments;
+import com.star.bank.model.rule.SimpleRule;
 import com.star.bank.repositories.DynamicRuleRepository;
+import com.star.bank.repositories.RuleRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class DynamicRuleService {
 
     private final DynamicRuleRepository dynamicRuleRepository;
     private final DynamicRuleMapper dynamicRuleMapper;
     private final ApplicationEventPublisher eventPublisher;
-
-    public DynamicRuleService(DynamicRuleRepository dynamicRuleRepository, DynamicRuleMapper dynamicRuleMapper, ApplicationEventPublisher eventPublisher) {
-        this.dynamicRuleRepository = dynamicRuleRepository;
-        this.dynamicRuleMapper = dynamicRuleMapper;
-        this.eventPublisher = eventPublisher;
-    }
+    private final RuleRepository ruleRepository;
+    private final EntityManager entityManager;
 
     @Transactional
     public void deleteDynamicRule(String productId) {
@@ -58,10 +58,37 @@ public class DynamicRuleService {
             throw new IllegalArgumentException();
         }
 
-        // TODO добавить дополнительные логические проверки
+        DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
+
+        Set<SimpleRule> updatedRules = dynamicRule.getRules() != null ? dynamicRule.getRules() : new HashSet<>();
+
+        for (SimpleRule rule : dynamicRule.getRules()) {
+            RuleArguments arguments = rule.getArguments();
+
+            if (arguments.getId() == 0) {
+                boolean exists = ruleRepository.existsRuleByType(0, arguments);
+                if (exists) {
+                    throw new IllegalStateExceptionWithDetails("Rule", String.valueOf(arguments.getId()));
+                }
+            }
+
+            Optional<SimpleRule> existingRuleOptional = ruleRepository.findRuleById(arguments.getId());
+
+            if (existingRuleOptional.isPresent()) {
+                SimpleRule existingRule = existingRuleOptional.get();
+                existingRule.setQueryType(rule.getQueryType());
+                existingRule.setNegate(rule.isNegate());
+                existingRule.setArguments(rule.getArguments());
+
+                updatedRules.add(existingRule);
+            } else {
+                updatedRules.add(rule);
+            }
+        }
+
+        dynamicRule.setRules(updatedRules);
 
         try {
-            DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
             dynamicRuleRepository.save(dynamicRule);
         } catch (DataIntegrityViolationException e) {
             throw new InvalidRuleDataException(e);
