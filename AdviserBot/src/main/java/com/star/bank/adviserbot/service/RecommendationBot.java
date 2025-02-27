@@ -8,6 +8,8 @@ import com.pengrad.telegrambot.response.SendResponse;
 import com.star.bank.model.dto.PersonalRecommendationTgDto;
 import com.star.bank.model.product.Product;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 
 @Service
 public class RecommendationBot {
+    private static final Logger logger = LoggerFactory.getLogger(RecommendationBot.class);
 
     private TelegramBot bot;
     private RestTemplate restTemplate;
@@ -33,7 +36,7 @@ public class RecommendationBot {
     @PostConstruct
     public void init() {
         this.bot = new TelegramBot(token);
-        System.out.println("Бот запущен");
+        logger.info("Бот запущен");
         startBot();
     }
 
@@ -52,8 +55,10 @@ public class RecommendationBot {
         String text = update.message().text();
         long chatId = update.message().chat().id();
 
+        logger.info("Получено сообщение: {}", text);
+
         if (text.equals("/start")) {
-            sendMessage(chatId, "Привет! Используйте команду /recommend Имя Фамилия");
+            sendMessage(chatId, "Привет! Для получения рекомендаций по банковским продуктам, используйте команду /recommend Имя Фамилия!");
         } else if (text.startsWith("/recommend ")) {
             handleRecommendCommand(chatId, text);
         }
@@ -61,34 +66,42 @@ public class RecommendationBot {
 
     private void handleRecommendCommand(long chatId, String text) {
         String[] parts = text.split(" ", 3);
-        if (parts.length < 3) {
-            sendMessage(chatId, "Формат команды: /recommend Имя Фамилия");
+        if (parts.length < 3 || !isValidName(parts[1]) || !isValidName(parts[2])) {
+            logger.warn("Неверный формат данных: {}", text);
+            sendMessage(chatId, "Неверный формат данных. Используйте команду в формате: /recommend Имя Фамилия");
             return;
         }
 
         String firstName = parts[1];
         String lastName = parts[2];
 
+        logger.info("Запрос на рекомендации для: {} {}", firstName, lastName);
+
         PersonalRecommendationTgDto response = getRecommendationsFromBank(firstName, lastName);
         if (response != null) {
             sendRecommendations(chatId, response);
         } else {
-            sendMessage(chatId, "Пользователь не найден.");
+            sendMessage(chatId, "Сервис временно недоступен. Пожалуйста, попробуйте позже.");
         }
     }
 
     private PersonalRecommendationTgDto getRecommendationsFromBank(String firstName, String lastName) {
         String url = String.format("%s/recommendation/username/%s", mainAppUrl, firstName);
 
+        logger.info("Запрос к сервису по URL: {}", url);
+
         try {
             return restTemplate.getForObject(url, PersonalRecommendationTgDto.class);
         } catch (RestClientException e) {
-            System.err.println("Ошибка при обращении к сервису: " + e.getMessage());
+            logger.error("Ошибка при обращении к сервису: {}", e.getMessage());
             return null;
         }
     }
 
     private void sendRecommendations(long chatId, PersonalRecommendationTgDto recommendation) {
+
+        logger.info("Отправка рекомендаций для пользователя: {} {}", recommendation.getFirstName(), recommendation.getLastName());
+
         StringBuilder messageText = new StringBuilder();
         messageText.append("Здравствуйте, ").append(recommendation.getFirstName()).append(" ").append(recommendation.getLastName()).append("\n\n");
         messageText.append("Новые продукты для вас:\n");
@@ -109,7 +122,11 @@ public class RecommendationBot {
         SendMessage message = new SendMessage(chatId, text);
         SendResponse response = bot.execute(message);
         if (!response.isOk()) {
-            System.err.println("Ошибка при отправке сообщения: " + response.description());
+            logger.error("Ошибка при отправке сообщения: {}", response.description());
         }
+    }
+
+    private boolean isValidName(String name) {
+        return name.matches("[A-Za-zА-Яа-яЁё]+");
     }
 }
