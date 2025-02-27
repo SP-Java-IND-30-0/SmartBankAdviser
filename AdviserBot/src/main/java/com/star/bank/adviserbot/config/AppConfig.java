@@ -1,4 +1,4 @@
-package com.star.bank.adviserbot.service;
+package com.star.bank.adviserbot.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
