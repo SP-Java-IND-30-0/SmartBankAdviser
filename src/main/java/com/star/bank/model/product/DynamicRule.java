@@ -6,6 +6,7 @@ import com.star.bank.model.rule.SimpleRule;
 import com.star.bank.utils.Literals;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 import java.util.StringJoiner;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class DynamicRule implements Product {
 
     @Id
