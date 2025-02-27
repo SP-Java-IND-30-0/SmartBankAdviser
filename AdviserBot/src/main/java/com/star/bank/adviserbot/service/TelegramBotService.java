@@ -65,7 +65,7 @@ public class TelegramBotService {
 
         String text = message.text();
         if (text == null || !isValidNameFormat(text)) {
-            bot.execute(new SendMessage(chatId, "Неверный формат данных. Введите ФИО: Иванов Иван Иванович или Иванов Иван."));
+            bot.execute(new SendMessage(chatId, "Неверный формат данных. Введите: Иванов Иван."));
             return;
         }
 
