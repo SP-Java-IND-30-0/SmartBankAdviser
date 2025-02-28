@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
 
@@ -81,7 +82,7 @@ public class RecommendationBot {
         if (response != null) {
             sendRecommendations(chatId, response);
         } else {
-            sendMessage(chatId, "Сервис временно недоступен. Пожалуйста, попробуйте позже.");
+            sendMessage(chatId, "Сервис временно недоступен. Пожалуйста, попробуйте позже");
         }
     }
 
@@ -94,6 +95,11 @@ public class RecommendationBot {
             return restTemplate.getForObject(url, PersonalRecommendationTgDto.class);
         } catch (RestClientException e) {
             logger.error("Ошибка при обращении к сервису: {}", e.getMessage());
+
+            if (e.getCause() instanceof HttpClientErrorException.NotFound) {
+                logger.warn("Пользователь не найден: {}", firstName, lastName);
+                return null;
+            }
             return null;
         }
     }
