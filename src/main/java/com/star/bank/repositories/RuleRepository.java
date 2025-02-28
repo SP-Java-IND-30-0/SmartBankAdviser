@@ -1,71 +1,80 @@
 package com.star.bank.repositories;
 
+import com.star.bank.model.enums.BankProductType;
+import com.star.bank.model.enums.CompareType;
+import com.star.bank.model.enums.OperationType;
+import com.star.bank.model.enums.QueryType;
 import com.star.bank.model.rule.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 @RequiredArgsConstructor
 public class RuleRepository {
     private final EntityManager entityManager;
 
-    private Predicate buildArgumentPredicate(CriteriaBuilder cb, Root<SimpleRule> root, RuleArguments ruleArguments) {
-        Predicate predicate = cb.conjunction();
-
-        if (ruleArguments instanceof RuleUserOf ruleUserOf) {
-            Join<SimpleRule, RuleUserOf> ruleUserOfJoin = root.join("arguments", JoinType.INNER);
-            predicate = cb.and(predicate,
-                    cb.equal(ruleUserOfJoin.get("productType"), ruleUserOf.getProductType()));
-        } else if (ruleArguments instanceof RuleActiveUserOf ruleActiveUserOf) {
-            Join<SimpleRule, RuleActiveUserOf> ruleActiveUserOfJoin = root.join("arguments", JoinType.INNER);
-            predicate = cb.and(predicate,
-                    cb.equal(ruleActiveUserOfJoin.get("productType"), ruleActiveUserOf.getProductType()));
-        } else if (ruleArguments instanceof RuleCompareSum ruleCompareSum) {
-            Join<SimpleRule, RuleCompareSum> ruleCompareSumJoin = root.join("arguments", JoinType.INNER);
-            predicate = cb.and(predicate,
-                    cb.equal(ruleCompareSumJoin.get("productType"), ruleCompareSum.getProductType()),
-                    cb.equal(ruleCompareSumJoin.get("operationType"), ruleCompareSum.getOperationType()),
-                    cb.equal(ruleCompareSumJoin.get("compareType"), ruleCompareSum.getCompareType()),
-                    cb.equal(ruleCompareSumJoin.get("amount"), ruleCompareSum.getAmount()));
-        } else if (ruleArguments instanceof RuleCompareOperationSum ruleCompareOperationSum) {
-            Join<SimpleRule, RuleCompareOperationSum> ruleCompareOperationSumJoin = root.join("arguments", JoinType.INNER);
-            predicate = cb.and(predicate,
-                    cb.equal(ruleCompareOperationSumJoin.get("productType"), ruleCompareOperationSum.getProductType()),
-                    cb.equal(ruleCompareOperationSumJoin.get("compareType"), ruleCompareOperationSum.getCompareType()));
-        } else {
-            throw new IllegalArgumentException("Неизвестный тип правила: " + ruleArguments.getClass().getSimpleName());
-        }
-
-        return predicate;
-    }
-
-    public Optional<SimpleRule> findRuleById(int id) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<SimpleRule> query = cb.createQuery(SimpleRule.class);
-        Root<SimpleRule> root = query.from(SimpleRule.class);
-
-        Predicate predicate = cb.equal(root.get("id"), id);
-
-        query.select(root).where(predicate);
-
-        return entityManager.createQuery(query).getResultStream().findFirst();
-    }
-
-    public boolean existsRuleByType(int id, RuleArguments ruleArguments) {
+    public <T> boolean existsRule(Class<T> ruleClass, BankProductType productType) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
-        Root<SimpleRule> root = query.from(SimpleRule.class);
+        Root<T> root = query.from(ruleClass);
 
-        Predicate predicate = cb.equal(root.get("id"), id);
-
-        predicate = cb.and(predicate, buildArgumentPredicate(cb, root, ruleArguments));
-
-        query.select(cb.count(root)).where(predicate);
+        query.select(cb.count(root))
+                .where(cb.equal(root.get("productType"), productType));
 
         return entityManager.createQuery(query).getSingleResult() > 0;
+    }
+
+    public boolean existsRuleCompareSum(BankProductType productType, OperationType operationType, CompareType compareType, int amount) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<RuleCompareSum> root = query.from(RuleCompareSum.class);
+
+        query.select(cb.count(root))
+                .where(cb.equal(root.get("productType"), productType),
+                        cb.equal(root.get("operationType"), operationType),
+                        cb.equal(root.get("compareType"), compareType),
+                        cb.equal(root.get("amount"), amount));
+
+        return entityManager.createQuery(query).getSingleResult() > 0;
+    }
+
+    public boolean existsRuleCompareOperationSum(BankProductType productType, CompareType compareType) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<RuleCompareOperationSum> root = query.from(RuleCompareOperationSum.class);
+
+        query.select(cb.count(root))
+                .where(cb.equal(root.get("productType"), productType),
+                        cb.equal(root.get("compareType"), compareType));
+
+        return entityManager.createQuery(query).getSingleResult() > 0;
+    }
+
+    public boolean ruleExists(SimpleRule rule, BankProductType productType) {
+        QueryType queryType = rule.getQueryType();
+        RuleArguments arguments = rule.getArguments();
+
+        if (queryType == QueryType.USER_OF || queryType == QueryType.ACTIVE_USER_OF) {
+            return existsRule(SimpleRule.class, productType);
+        }
+
+        boolean argumentsExist = switch (queryType) {
+            case TRANSACTION_SUM_COMPARE -> arguments instanceof RuleCompareSum compareSumArguments &&
+                    existsRuleCompareSum(productType, compareSumArguments.getOperationType(), compareSumArguments.getCompareType(), compareSumArguments.getAmount());
+
+            case TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW -> arguments instanceof RuleCompareOperationSum compareOperationSumArguments &&
+                    existsRuleCompareOperationSum(productType, compareOperationSumArguments.getCompareType());
+
+            default -> false;
+        };
+
+        return argumentsExist && entityManager.createQuery("""
+            SELECT COUNT(sr) FROM SimpleRule sr
+            WHERE sr.arguments = :arguments
+            """, Long.class)
+                .setParameter("arguments", arguments)
+                .getSingleResult() > 0;
     }
 }

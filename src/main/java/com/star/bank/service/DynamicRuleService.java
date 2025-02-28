@@ -4,9 +4,9 @@ import com.star.bank.event.DeleteDynamicRuleEvent;
 import com.star.bank.exception.*;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
+import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.product.DynamicRule;
-import com.star.bank.model.rule.RuleArguments;
-import com.star.bank.model.rule.SimpleRule;
+import com.star.bank.model.rule.*;
 import com.star.bank.repositories.DynamicRuleRepository;
 import com.star.bank.repositories.RuleRepository;
 import jakarta.persistence.EntityManager;
@@ -59,30 +59,16 @@ public class DynamicRuleService {
         }
 
         DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
+        Set<SimpleRule> updatedRules = Optional.ofNullable(dynamicRule.getRules()).orElse(new HashSet<>());
 
-        Set<SimpleRule> updatedRules = dynamicRule.getRules() != null ? dynamicRule.getRules() : new HashSet<>();
-
-        for (SimpleRule rule : dynamicRule.getRules()) {
+        for (SimpleRule rule : updatedRules) {
             RuleArguments arguments = rule.getArguments();
+            BankProductType productType = extractProductType(arguments);
 
-            if (arguments.getId() == 0) {
-                boolean exists = ruleRepository.existsRuleByType(0, arguments);
-                if (exists) {
-                    throw new IllegalStateExceptionWithDetails("Rule", String.valueOf(arguments.getId()));
-                }
-            }
-
-            Optional<SimpleRule> existingRuleOptional = ruleRepository.findRuleById(arguments.getId());
-
-            if (existingRuleOptional.isPresent()) {
-                SimpleRule existingRule = existingRuleOptional.get();
-                existingRule.setQueryType(rule.getQueryType());
-                existingRule.setNegate(rule.isNegate());
-                existingRule.setArguments(rule.getArguments());
-
-                updatedRules.add(existingRule);
+            if (!ruleRepository.ruleExists(rule, productType)) {
+                entityManager.persist(rule);
             } else {
-                updatedRules.add(rule);
+                entityManager.merge(rule);
             }
         }
 
@@ -111,6 +97,20 @@ public class DynamicRuleService {
         } catch (DataAccessException e) {
             throw new DatabaseAccessException(e);
 
+        }
+    }
+
+    private BankProductType extractProductType(RuleArguments arguments) {
+        if (arguments instanceof RuleCompareSum) {
+            return ((RuleCompareSum) arguments).getProductType();
+        } else if (arguments instanceof RuleCompareOperationSum) {
+            return ((RuleCompareOperationSum) arguments).getProductType();
+        } else if (arguments instanceof RuleUserOf) {
+            return ((RuleUserOf) arguments).getProductType();
+        } else if (arguments instanceof RuleActiveUserOf) {
+            return ((RuleActiveUserOf) arguments).getProductType();
+        } else {
+            throw new IllegalArgumentException("Не удалось извлечь тип продукта");
         }
     }
 }
