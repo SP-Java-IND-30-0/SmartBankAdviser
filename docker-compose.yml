@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   postgres:
@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U your_username -d your_database_name"]
+      test: ["CMD-SHELL", "pg_isready -U root -d smart_banking_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,12 +26,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_banking_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 1
-      SPRING_H2_DATASOURCE_URL: jdbc:h2:file:/data/database
+      PG_DATABASE_JDBC_URL: jdbc:postgresql://postgres:5432/smart_banking_db
+      PG_DATABASE_USERNAME: root
+      PG_DATABASE_PASSWORD: 1
+      H2_DATABASE_JDBC_URL: jdbc:h2:file:/data/transaction
     volumes:
-      - ./src/main/resources/db/database.mv.db:/data/database.mv.db
+      - ./src/main/resources/db/transaction.mv.db:/data/transaction.mv.db
 
   adviserbot:
     build:

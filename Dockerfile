@@ -2,9 +2,9 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY build/libs/SmartBankAdviser.jar SmartBankAdviser.jar
+COPY build/libs/SmartBankAdviser-1.0.0.jar SmartBankAdviser.jar
 
-COPY src/main/resources/db/database.mv.db /data/database.mv.db
+COPY src/main/resources/db/transaction.mv.db /data/transaction.mv.db
 
 EXPOSE 8080
 
