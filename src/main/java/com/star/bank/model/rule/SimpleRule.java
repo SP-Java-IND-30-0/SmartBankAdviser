@@ -15,7 +15,7 @@ public class SimpleRule implements Rule {
     @Enumerated(EnumType.ORDINAL)
     private QueryType queryType;
     private boolean negate;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne (cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "arguments_id")
     private RuleArguments arguments;
 
