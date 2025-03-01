@@ -6,9 +6,13 @@ import com.star.bank.model.enums.OperationType;
 import com.star.bank.model.enums.QueryType;
 import com.star.bank.model.rule.*;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -64,17 +68,59 @@ public class RuleRepository {
             case TRANSACTION_SUM_COMPARE -> arguments instanceof RuleCompareSum compareSumArguments &&
                     existsRuleCompareSum(productType, compareSumArguments.getOperationType(), compareSumArguments.getCompareType(), compareSumArguments.getAmount());
 
-            case TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW -> arguments instanceof RuleCompareOperationSum compareOperationSumArguments &&
-                    existsRuleCompareOperationSum(productType, compareOperationSumArguments.getCompareType());
+            case TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW ->
+                    arguments instanceof RuleCompareOperationSum compareOperationSumArguments &&
+                            existsRuleCompareOperationSum(productType, compareOperationSumArguments.getCompareType());
 
             default -> false;
         };
 
         return argumentsExist && entityManager.createQuery("""
-            SELECT COUNT(sr) FROM SimpleRule sr
-            WHERE sr.arguments = :arguments
-            """, Long.class)
+                        SELECT COUNT(sr) FROM SimpleRule sr
+                        WHERE sr.arguments = :arguments
+                        """, Long.class)
                 .setParameter("arguments", arguments)
                 .getSingleResult() > 0;
+    }
+
+    public <T extends RuleArguments> Optional<T> findRuleArguments(T arguments) {
+        if (arguments instanceof RuleUserOf ruleUserOf) {
+            return entityManager.createQuery("""
+                            SELECT ru FROM RuleUserOf ru
+                            WHERE ru.productType=:productType
+                            """, RuleUserOf.class)
+                    .setParameter("productType", ruleUserOf.getProductType())
+                    .getResultList()
+                    .stream().findFirst().map(r -> (T) r);
+        } else if (arguments instanceof RuleActiveUserOf ruleActiveUserOf) {
+            return entityManager.createQuery("""
+                            SELECT ra FROM RuleActiveUserOf ra
+                            WHERE ra.productType=:productType
+                            """, RuleActiveUserOf.class)
+                    .setParameter("productType", ruleActiveUserOf.getProductType())
+                    .getResultList()
+                    .stream().findFirst().map(r -> (T) r);
+        } else if (arguments instanceof RuleCompareSum ruleCompareSum) {
+            return entityManager.createQuery("""
+                            SELECT rc FROM RuleCompareSum rc
+                            WHERE rc.productType=:productType AND rc.operationType=:operationType AND rc.compareType=:compareType AND rc.amount=:amount
+                            """, RuleCompareSum.class)
+                    .setParameter("productType", ruleCompareSum.getProductType())
+                    .setParameter("operationType", ruleCompareSum.getOperationType())
+                    .setParameter("compareType", ruleCompareSum.getCompareType())
+                    .setParameter("amount", ruleCompareSum.getAmount())
+                    .getResultList()
+                    .stream().findFirst().map(r -> (T) r);
+        } else if (arguments instanceof RuleCompareOperationSum ruleCompareOperationSum) {
+            return entityManager.createQuery("""
+                            SELECT rcs FROM RuleCompareOperationSum rcs
+                            WHERE rcs.productType=:productType AND rcs.compareType=:compareType
+                            """, RuleCompareOperationSum.class)
+                    .setParameter("productType", ruleCompareOperationSum.getProductType())
+                    .setParameter("compareType", ruleCompareOperationSum.getCompareType())
+                    .getResultList()
+                    .stream().findFirst().map(r -> (T) r);
+        }
+        return Optional.empty();
     }
 }

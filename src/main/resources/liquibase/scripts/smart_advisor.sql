@@ -133,3 +133,13 @@ alter table public.rule_arguments
     alter column query_type type varchar(50) using query_type::varchar(50);
 
 alter table rule_arguments drop column if exists simple_rule_id;
+
+-- changeset belousoveu:8
+alter table simple_rules drop constraint  fk_simple_rules_arguments_id;
+
+alter table simple_rules drop constraint uk_simple_rules_arguments_id;
+
+alter table simple_rules add constraint fk_simple_rules_arguments_id
+    foreign key (arguments_id) references rule_arguments (id);
+
+

@@ -63,13 +63,15 @@ public class DynamicRuleService {
 
         for (SimpleRule rule : updatedRules) {
             RuleArguments arguments = rule.getArguments();
-            BankProductType productType = extractProductType(arguments);
+//            BankProductType productType = extractProductType(arguments);
 
-            if (!ruleRepository.ruleExists(rule, productType)) {
-                entityManager.persist(rule);
-            } else {
-                entityManager.merge(rule);
-            }
+            RuleArguments updatedArguments = ruleRepository.findRuleArguments(arguments).orElse(arguments);
+            rule.setArguments(updatedArguments);
+//            if (!ruleRepository.ruleExists(rule, productType)) {
+//                entityManager.persist(rule);
+//            } else {
+//                entityManager.merge(rule);
+//            }
         }
 
         dynamicRule.setRules(updatedRules);
@@ -100,17 +102,17 @@ public class DynamicRuleService {
         }
     }
 
-    private BankProductType extractProductType(RuleArguments arguments) {
-        if (arguments instanceof RuleCompareSum) {
-            return ((RuleCompareSum) arguments).getProductType();
-        } else if (arguments instanceof RuleCompareOperationSum) {
-            return ((RuleCompareOperationSum) arguments).getProductType();
-        } else if (arguments instanceof RuleUserOf) {
-            return ((RuleUserOf) arguments).getProductType();
-        } else if (arguments instanceof RuleActiveUserOf) {
-            return ((RuleActiveUserOf) arguments).getProductType();
-        } else {
-            throw new IllegalArgumentException("Не удалось извлечь тип продукта");
-        }
-    }
+//    private BankProductType extractProductType(RuleArguments arguments) {
+//        if (arguments instanceof RuleCompareSum) {
+//            return ((RuleCompareSum) arguments).getProductType();
+//        } else if (arguments instanceof RuleCompareOperationSum) {
+//            return ((RuleCompareOperationSum) arguments).getProductType();
+//        } else if (arguments instanceof RuleUserOf) {
+//            return ((RuleUserOf) arguments).getProductType();
+//        } else if (arguments instanceof RuleActiveUserOf) {
+//            return ((RuleActiveUserOf) arguments).getProductType();
+//        } else {
+//            throw new IllegalArgumentException("Не удалось извлечь тип продукта");
+//        }
+//    }
 }
