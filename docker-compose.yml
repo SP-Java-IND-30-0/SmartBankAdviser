@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: smart_banking_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 1
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U your_username -d your_database_name"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  smartbankadviser:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smart_banking_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1
+      SPRING_H2_DATASOURCE_URL: jdbc:h2:file:/data/database
+    volumes:
+      - ./src/main/resources/db/database.mv.db:/data/database.mv.db
+
+  adviserbot:
+    build:
+      context: ./AdviserBot
+    ports:
+      - "8081:8081"
+    depends_on:
+      - smartbankadviser
+    environment:
+      SMARTBANK_ADVISER_URL: http://smartbankadviser:8080
+
+volumes:
+  postgres_data:
