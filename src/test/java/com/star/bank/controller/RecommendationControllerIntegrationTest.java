@@ -89,7 +89,7 @@ class RecommendationControllerIntegrationTest {
         registry.add("spring.datasource.url", cont::getJdbcUrl);
         registry.add("spring.datasource.username", cont::getUsername);
         registry.add("spring.datasource.password", cont::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop"); // Убедитесь, что схема создается
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
     }
 
