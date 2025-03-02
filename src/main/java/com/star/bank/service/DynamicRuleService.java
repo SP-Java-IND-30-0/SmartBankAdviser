@@ -4,14 +4,14 @@ import com.star.bank.event.DeleteDynamicRuleEvent;
 import com.star.bank.exception.*;
 import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
-import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.product.DynamicRule;
-import com.star.bank.model.rule.*;
+import com.star.bank.model.rule.RuleArguments;
+import com.star.bank.model.rule.SimpleRule;
 import com.star.bank.repositories.DynamicRuleRepository;
 import com.star.bank.repositories.RuleRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,13 +22,13 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DynamicRuleService {
 
     private final DynamicRuleRepository dynamicRuleRepository;
     private final DynamicRuleMapper dynamicRuleMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final RuleRepository ruleRepository;
-    private final EntityManager entityManager;
 
     @Transactional
     public void deleteDynamicRule(String productId) {
@@ -45,6 +45,7 @@ public class DynamicRuleService {
         try {
             dynamicRuleRepository.deleteById(uuid);
             eventPublisher.publishEvent(new DeleteDynamicRuleEvent(this, uuid));
+            log.info("Dynamic rule with productId {} deleted", uuid);
         } catch (EmptyResultDataAccessException e) {
             throw new ProductNotFoundException(uuid, e);
         } catch (DataAccessException e) {
@@ -63,19 +64,16 @@ public class DynamicRuleService {
 
         for (SimpleRule rule : updatedRules) {
             RuleArguments arguments = rule.getArguments();
-            BankProductType productType = extractProductType(arguments);
 
-            if (!ruleRepository.ruleExists(rule, productType)) {
-                entityManager.persist(rule);
-            } else {
-                entityManager.merge(rule);
-            }
+            RuleArguments updatedArguments = ruleRepository.findRuleArguments(arguments).orElse(arguments);
+            rule.setArguments(updatedArguments);
         }
 
         dynamicRule.setRules(updatedRules);
 
         try {
             dynamicRuleRepository.save(dynamicRule);
+            log.info("Dynamic rule with productId {} saved", dynamicRule.getProductId());
         } catch (DataIntegrityViolationException e) {
             throw new InvalidRuleDataException(e);
         } catch (DataAccessException e) {
@@ -97,20 +95,6 @@ public class DynamicRuleService {
         } catch (DataAccessException e) {
             throw new DatabaseAccessException(e);
 
-        }
-    }
-
-    private BankProductType extractProductType(RuleArguments arguments) {
-        if (arguments instanceof RuleCompareSum) {
-            return ((RuleCompareSum) arguments).getProductType();
-        } else if (arguments instanceof RuleCompareOperationSum) {
-            return ((RuleCompareOperationSum) arguments).getProductType();
-        } else if (arguments instanceof RuleUserOf) {
-            return ((RuleUserOf) arguments).getProductType();
-        } else if (arguments instanceof RuleActiveUserOf) {
-            return ((RuleActiveUserOf) arguments).getProductType();
-        } else {
-            throw new IllegalArgumentException("Не удалось извлечь тип продукта");
         }
     }
 }
