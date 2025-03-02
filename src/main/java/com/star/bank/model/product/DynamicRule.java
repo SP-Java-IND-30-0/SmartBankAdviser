@@ -6,6 +6,7 @@ import com.star.bank.model.rule.SimpleRule;
 import com.star.bank.utils.Literals;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 import java.util.StringJoiner;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class DynamicRule implements Product {
 
     @Id
@@ -35,7 +37,11 @@ public class DynamicRule implements Product {
     @JsonIgnore
     public String getQuery() {
         StringJoiner joiner = new StringJoiner(" AND ", Literals.QUERY_PREFIX, Literals.QUERY_SUFFIX);
-        rules.forEach(rule -> joiner.add(rule.getSubQuery()));
+        if (rules != null && !rules.isEmpty()) {
+            rules.forEach(rule -> joiner.add(rule.getSubQuery()));
+        } else {
+            joiner.add("1=1");
+        }
         return joiner.toString();
     }
 

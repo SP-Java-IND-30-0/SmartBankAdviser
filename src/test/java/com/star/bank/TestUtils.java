@@ -10,7 +10,10 @@ import com.star.bank.model.rule.RuleArguments;
 import com.star.bank.model.rule.RuleUserOf;
 import com.star.bank.model.rule.SimpleRule;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class TestUtils {
 
@@ -46,49 +49,6 @@ public class TestUtils {
         rule.setProductText(PRODUCT_TEXT);
         rule.setRules(Collections.emptySet());
         return rule;
-    }
-
-    public static DynamicRule createDynamicRule() {
-        DynamicRule dynamicRule = new DynamicRule();
-        dynamicRule.setProductId(UUID.fromString(PRODUCT_ID));
-        dynamicRule.setProductName(PRODUCT_NAME);
-        dynamicRule.setProductText(PRODUCT_TEXT);
-
-        Set<SimpleRule> rules = new HashSet<>();
-        rules.add(createSimpleRule());
-        dynamicRule.setRules(rules);
-
-        return dynamicRule;
-    }
-
-    public static SimpleRule createSimpleRule() {
-        SimpleRule simpleRule = new SimpleRule();
-        simpleRule.setId(0);
-        simpleRule.setQueryType(QueryType.USER_OF);
-        simpleRule.setNegate(false);
-
-        RuleArguments arguments = createRuleArguments();
-        simpleRule.setArguments(arguments);
-
-        return simpleRule;
-    }
-
-    public static RuleArguments createRuleArguments() {
-        RuleArguments arguments = new SpecificRuleArguments();
-        arguments.setId(1);
-        return arguments;
-    }
-
-    public static class SpecificRuleArguments extends RuleArguments {
-        @Override
-        public List<String> convertToList() {
-            return Arrays.asList("argument1", "argument2");
-        }
-
-        @Override
-        public String getSubQuery() {
-            return "SELECT * FROM table";
-        }
     }
 
     public static TestDynamicRule createTestDynamicRule() {

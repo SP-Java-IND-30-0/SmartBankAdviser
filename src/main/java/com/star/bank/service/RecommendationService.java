@@ -10,18 +10,15 @@ import com.star.bank.model.dto.UserDto;
 import com.star.bank.model.product.DynamicRule;
 import com.star.bank.model.product.Product;
 import com.star.bank.repositories.RecommendationRepository;
-
+import lombok.Getter;
 import org.springframework.context.ApplicationEventPublisher;
-
 import org.springframework.scheduling.annotation.Async;
-
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import java.util.concurrent.CompletableFuture;
 
 
@@ -31,6 +28,7 @@ public class RecommendationService {
     private final DynamicRuleService dynamicRuleService;
     private final DynamicRuleMapper dynamicRuleMapper;
     private final ApplicationEventPublisher eventPublisher;
+    @Getter
     private final Set<Product> products;
 
 
@@ -41,7 +39,6 @@ public class RecommendationService {
         this.eventPublisher = eventPublisher;
         this.products = products;
     }
-
 
     @Async
     public CompletableFuture<PersonalRecommendationDto> sendRecommendation(String userId) {
@@ -55,7 +52,6 @@ public class RecommendationService {
         if (!repository.isUserExist(userId)) {
             throw new UserNotFoundException(userId);
         }
-        addDynamicRules();
         PersonalRecommendationDto dto = new PersonalRecommendationDto(userId);
 
         dto.setRecommendations(getRecommendations(userId));
@@ -63,27 +59,12 @@ public class RecommendationService {
         return CompletableFuture.completedFuture(dto);
     }
 
-    private List<Product> getRecommendations(String userId) {
-        List<Product> result = new ArrayList<>();
-        addDynamicRules();
-        for (Product pr : products) {
-            if (repository.checkProductRules(userId, pr.getQuery())) {
-
-                result.add(pr);
-                eventPublisher.publishEvent(new SendRecommendationEvent(this, pr));
-
-            }
-        }
-        return result;
-    }
-
-
-
     public List<UUID> getAllUserIds() {
         return repository.getAllUserIds();
     }
-      
 
+
+    @Async
     public CompletableFuture<PersonalRecommendationTgDto> sendRecommendationTg(String username) {
 
         List<UserDto> users = repository.getUser(username);
@@ -98,6 +79,18 @@ public class RecommendationService {
         dto.setRecommendations(getRecommendations(users.get(0).getId()));
 
         return CompletableFuture.completedFuture(dto);
+    }
+
+    private List<Product> getRecommendations(String userId) {
+        List<Product> result = new ArrayList<>();
+        addDynamicRules();
+        for (Product pr : products) {
+            if (repository.checkProductRules(userId, pr.getQuery())) {
+                result.add(pr);
+                eventPublisher.publishEvent(new SendRecommendationEvent(this, pr));
+            }
+        }
+        return result;
     }
 
     private void addDynamicRules() {
