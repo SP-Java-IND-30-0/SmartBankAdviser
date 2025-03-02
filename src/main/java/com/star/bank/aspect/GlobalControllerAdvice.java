@@ -38,9 +38,4 @@ public class GlobalControllerAdvice {
     public ResponseEntity<String> handleBadRequestExceptions(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
-
-    @ExceptionHandler(IllegalStateExceptionWithDetails.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateExceptionWithDetails ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
 }
