@@ -62,11 +62,6 @@ class DynamicRuleServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenDtoIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> dynamicRuleService.saveDynamicRule(null));
-    }
-
-    @Test
     void shouldUpdateRuleArgumentsIfFound() {
         SimpleRule rule = new SimpleRule();
         rule.setArguments(TestUtils.USER_OF_DEBIT);
@@ -80,6 +75,8 @@ class DynamicRuleServiceTest {
         dynamicRuleService.saveDynamicRule(TestUtils.createDynamicRuleDto());
 
         Assertions.assertEquals(TestUtils.USER_OF_CREDIT, rule.getArguments());
+        verify(ruleRepository, times(entity.getRules().size())).findRuleArguments(any());
+        verify(dynamicRuleRepository, times(1)).save(entity);
     }
 
     @Test
@@ -94,8 +91,10 @@ class DynamicRuleServiceTest {
         when(dynamicRuleRepository.save(entity)).thenReturn(entity);
 
         dynamicRuleService.saveDynamicRule(TestUtils.createDynamicRuleDto());
-
         Assertions.assertEquals(TestUtils.USER_OF_DEBIT, rule.getArguments());
+        verify(ruleRepository, times(entity.getRules().size())).findRuleArguments(any());
+
+        verify(dynamicRuleRepository, times(1)).save(entity);
     }
 
     @Test
@@ -128,16 +127,6 @@ class DynamicRuleServiceTest {
         dynamicRuleService.deleteDynamicRule(productId);
         verify(dynamicRuleRepository, times(1)).deleteById(uuid);
         verify(eventPublisher, times(1)).publishEvent(any(DeleteDynamicRuleEvent.class));
-    }
-
-    @Test
-    void shouldThrowInvalidProductIdExceptionWhenProductIdIsNull() {
-        assertThrows(InvalidProductIdException.class, () -> dynamicRuleService.deleteDynamicRule(null));
-    }
-
-    @Test
-    void shouldThrowInvalidProductIdExceptionWhenProductIdIsBlank() {
-        assertThrows(InvalidProductIdException.class, () -> dynamicRuleService.deleteDynamicRule("  "));
     }
 
     @Test
@@ -200,5 +189,17 @@ class DynamicRuleServiceTest {
         when(dynamicRuleRepository.findAll()).thenThrow(new DataAccessException("DB error") {});
 
         assertThrows(DatabaseAccessException.class, () -> dynamicRuleService.getDynamicRules());
+    }
+
+    @Test
+    void shouldThrowEmptyValueExceptionWhenDeletingWithNullOrBlankProductId() {
+        assertThrows(EmptyValueException.class, () -> dynamicRuleService.deleteDynamicRule(null));
+        assertThrows(EmptyValueException.class, () -> dynamicRuleService.deleteDynamicRule(""));
+        assertThrows(EmptyValueException.class, () -> dynamicRuleService.deleteDynamicRule("   "));
+    }
+
+    @Test
+    void shouldThrowEmptyValueExceptionWhenSavingNullDynamicRuleDto() {
+        assertThrows(EmptyValueException.class, () -> dynamicRuleService.saveDynamicRule(null));
     }
 }

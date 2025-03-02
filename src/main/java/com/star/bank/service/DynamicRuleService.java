@@ -35,7 +35,7 @@ public class DynamicRuleService {
         UUID uuid;
         try {
             if (productId == null || productId.isBlank()) {
-                throw new IllegalArgumentException();
+                throw new EmptyValueException("productId");
             }
             uuid = UUID.fromString(productId);
         } catch (IllegalArgumentException e) {
@@ -56,7 +56,7 @@ public class DynamicRuleService {
     @Transactional
     public void saveDynamicRule(DynamicRuleDto dynamicRuleDto) {
         if (dynamicRuleDto == null) {
-            throw new IllegalArgumentException();
+            throw new EmptyValueException("DynamicRuleDto");
         }
 
         DynamicRule dynamicRule = dynamicRuleMapper.toEntity(dynamicRuleDto);
