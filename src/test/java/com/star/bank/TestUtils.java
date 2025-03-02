@@ -5,15 +5,17 @@ import com.star.bank.model.dto.SimpleRuleDto;
 import com.star.bank.model.enums.BankProductType;
 import com.star.bank.model.enums.QueryType;
 import com.star.bank.model.product.DynamicRule;
+import com.star.bank.model.product.Invest500Product;
+import com.star.bank.model.product.Product;
 import com.star.bank.model.rule.RuleActiveUserOf;
 import com.star.bank.model.rule.RuleArguments;
 import com.star.bank.model.rule.RuleUserOf;
 import com.star.bank.model.rule.SimpleRule;
+import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import static com.star.bank.TestDynamicRule.*;
 
 public class TestUtils {
 
@@ -32,6 +34,7 @@ public class TestUtils {
     public static final String PRODUCT_TEXT = "Test Recommendation";
     public static final String RULES_ENDPOINT = "/rule";
     public static final String STATS_ENDPOINT = "/rule/stats";
+
 
     public static String createJsonContent() {
         return "{" +
@@ -134,31 +137,31 @@ public class TestUtils {
     }
 
     public static class TestSimpleRule {
-            SimpleRule simpleRule;
+        SimpleRule simpleRule;
 
-            public TestSimpleRule(int id) {
-                simpleRule = new SimpleRule();
-                simpleRule.setId(id);
-            }
+        public TestSimpleRule(int id) {
+            simpleRule = new SimpleRule();
+            simpleRule.setId(id);
+        }
 
-            public TestSimpleRule query(QueryType queryType) {
-                simpleRule.setQueryType(queryType);
-                return this;
-            }
+        public TestSimpleRule query(QueryType queryType) {
+            simpleRule.setQueryType(queryType);
+            return this;
+        }
 
-            public TestSimpleRule negate(boolean negate) {
-                simpleRule.setNegate(negate);
-                return this;
-            }
+        public TestSimpleRule negate(boolean negate) {
+            simpleRule.setNegate(negate);
+            return this;
+        }
 
-            public TestSimpleRule arguments(RuleArguments arguments) {
-                simpleRule.setArguments(arguments);
-                return this;
-            }
+        public TestSimpleRule arguments(RuleArguments arguments) {
+            simpleRule.setArguments(arguments);
+            return this;
+        }
 
-            public SimpleRule build() {
-                return simpleRule;
-            }
+        public SimpleRule build() {
+            return simpleRule;
+        }
     }
 
     public static class TestSimpleRuleDto {
@@ -186,5 +189,9 @@ public class TestUtils {
         public SimpleRuleDto build() {
             return simpleRuleDto;
         }
+    }
+
+    public record TestUser(UUID id, String username, String firstName, String lastName,
+                           Set<Product> products) {
     }
 }
