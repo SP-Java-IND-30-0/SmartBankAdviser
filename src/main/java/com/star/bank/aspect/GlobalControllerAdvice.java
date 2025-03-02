@@ -38,4 +38,9 @@ public class GlobalControllerAdvice {
     public ResponseEntity<String> handleBadRequestExceptions(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(EmptyValueException.class)
+    public ResponseEntity<String> handleEmptyValueException(EmptyValueException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
