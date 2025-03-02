@@ -137,31 +137,31 @@ public class TestUtils {
     }
 
     public static class TestSimpleRule {
-            SimpleRule simpleRule;
+        SimpleRule simpleRule;
 
-            public TestSimpleRule(int id) {
-                simpleRule = new SimpleRule();
-                simpleRule.setId(id);
-            }
+        public TestSimpleRule(int id) {
+            simpleRule = new SimpleRule();
+            simpleRule.setId(id);
+        }
 
-            public TestSimpleRule query(QueryType queryType) {
-                simpleRule.setQueryType(queryType);
-                return this;
-            }
+        public TestSimpleRule query(QueryType queryType) {
+            simpleRule.setQueryType(queryType);
+            return this;
+        }
 
-            public TestSimpleRule negate(boolean negate) {
-                simpleRule.setNegate(negate);
-                return this;
-            }
+        public TestSimpleRule negate(boolean negate) {
+            simpleRule.setNegate(negate);
+            return this;
+        }
 
-            public TestSimpleRule arguments(RuleArguments arguments) {
-                simpleRule.setArguments(arguments);
-                return this;
-            }
+        public TestSimpleRule arguments(RuleArguments arguments) {
+            simpleRule.setArguments(arguments);
+            return this;
+        }
 
-            public SimpleRule build() {
-                return simpleRule;
-            }
+        public SimpleRule build() {
+            return simpleRule;
+        }
     }
 
     public static class TestSimpleRuleDto {
