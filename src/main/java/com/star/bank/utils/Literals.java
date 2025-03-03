@@ -2,6 +2,9 @@ package com.star.bank.utils;
 
 public class Literals {
 
+    private Literals() {
+    }
+
     public static final String QUERY_PREFIX = "SELECT (";
     public static final String QUERY_SUFFIX = """
             ) AS result FROM PUBLIC.TRANSACTIONS T
