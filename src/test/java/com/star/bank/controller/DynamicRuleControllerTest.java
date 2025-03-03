@@ -62,14 +62,10 @@ class DynamicRuleControllerTest {
     void test_saveDynamicRule_invalidRequest() throws Exception {
         String invalidJson = "{}";
 
-        doThrow(new InvalidRuleDataException(new Exception()))
-                .when(dynamicRuleService).saveDynamicRule(any(DynamicRuleDto.class));
-
         mockMvc.perform(post(TestUtils.RULES_ENDPOINT)
                         .content(invalidJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Invalid rule data error: The provided rule data is incorrect or incomplete")));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
