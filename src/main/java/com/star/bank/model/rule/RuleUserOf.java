@@ -10,7 +10,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+/**
+ * Правило для проверки принадлежности пользователя к определённому типу продукта.
+ * Расширяет класс RuleArguments.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "rule_user_of",
@@ -20,10 +23,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RuleUserOf extends RuleArguments {
-
+    /**
+     * Тип продукта, который должен использовать пользователь.
+     */
     @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
 
+    /**
+     * Конструктор для создания правила из списка аргументов.
+     *
+     * @param arguments Список аргументов.
+     */
     public RuleUserOf(List<String> arguments) {
         super();
         if (arguments == null || arguments.size() != 1) {

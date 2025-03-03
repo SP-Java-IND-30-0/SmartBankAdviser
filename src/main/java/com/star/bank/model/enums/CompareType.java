@@ -1,7 +1,9 @@
 package com.star.bank.model.enums;
 
 import lombok.Getter;
-
+/**
+ * Перечисление типов сравнения.
+ */
 @Getter
 public enum CompareType {
     LT("<"),
@@ -16,6 +18,12 @@ public enum CompareType {
         this.value = value;
     }
 
+    /**
+     * Возвращает тип сравнения по строковому значению.
+     *
+     * @param s Строковое значение типа сравнения.
+     * @return Тип сравнения.
+     */
     public static CompareType findByValue(String s) {
         return switch (s) {
             case "<" -> LT;

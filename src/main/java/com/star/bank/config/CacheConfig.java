@@ -37,6 +37,9 @@ public class CacheConfig {
 
         org.springframework.cache.Cache cacheWrapper = caffeineCacheManager.getCache("userProductRulesCache");
 
+        if (cacheWrapper == null) {
+            throw new IllegalStateException("Cache 'userProductRulesCache' не найдена");
+        }
         if (!(cacheWrapper.getNativeCache() instanceof Cache<?, ?>)) {
             throw new IllegalStateException(
                     "Неподдерживаемый тип кэша: " + cacheWrapper.getNativeCache().getClass()
