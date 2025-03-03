@@ -1,5 +1,6 @@
 package com.star.bank.controller;
 
+import com.star.bank.exception.ProductNotFoundException;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.model.dto.StatsDto;
 import com.star.bank.service.DynamicRuleService;
@@ -7,6 +8,7 @@ import com.star.bank.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ public class DynamicRuleController {
     @Operation(summary = "Новое динамическое правило для пользователя")
     @ApiResponse(responseCode = "201", description = "Динамическое правило успешно создано")
     @ApiResponse(responseCode = "400", description = "Неверный формат запроса")
-    public ResponseEntity<DynamicRuleDto> saveDynamicRule(@RequestBody DynamicRuleDto dynamicRuleDto) {
+    public ResponseEntity<DynamicRuleDto> saveDynamicRule(@RequestBody @Valid DynamicRuleDto dynamicRuleDto) {
         dynamicRuleService.saveDynamicRule(dynamicRuleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dynamicRuleDto);
     }
@@ -43,12 +45,16 @@ public class DynamicRuleController {
     }
 
     @DeleteMapping("/{ruleId}")
-    @Operation(summary = "Получить список всех динамических правил")
+    @Operation(summary = "Удалить динамическое правило")
     @ApiResponse(responseCode = "204", description = "Динамическое правило успешно удалено")
     @ApiResponse(responseCode = "404", description = "Ресурс не найден на сервере")
     public ResponseEntity<Void> deleteDynamicRule(@PathVariable String ruleId) {
-        dynamicRuleService.deleteDynamicRule(ruleId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            dynamicRuleService.deleteDynamicRule(ruleId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/stats")
