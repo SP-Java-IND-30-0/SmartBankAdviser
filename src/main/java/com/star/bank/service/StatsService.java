@@ -11,6 +11,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * Сервис для сбора и предоставления статистики по динамическим правилам и продуктам.
+ * Отслеживает количество рекомендаций для каждого правила и предоставляет сводную статистику.
+ */
 @Service
 public class StatsService {
 
@@ -18,6 +22,12 @@ public class StatsService {
     private final DynamicRuleService dynamicRuleService;
     private final Set<Product> products;
 
+    /**
+     * Конструктор для инициализации сервиса.
+     *
+     * @param dynamicRuleService Сервис для работы с динамическими правилами.
+     * @param products           Набор продуктов.
+     */
     @Autowired
     public StatsService(DynamicRuleService dynamicRuleService, Set<Product> products) {
         this.dynamicRuleService = dynamicRuleService;
@@ -39,11 +49,21 @@ public class StatsService {
         return ruleIds;
     }
 
+    /**
+     * Увеличивает счётчик рекомендаций для продукта при получении события отправки рекомендации.
+     *
+     * @param event Событие отправки рекомендации.
+     */
     public void incrementProduct(SendRecommendationEvent event) {
         UUID ruleId = UUID.fromString(event.getProduct().getId());
         ruleCounters.merge(ruleId, 1, Integer::sum);
     }
 
+    /**
+     * Удаляет динамическое правило из списка счётчиков рекомендаций.
+     *
+     * @param ruleId Идентификатор динамического правила.
+     */
     public void deleteDynamicRule(UUID ruleId) {
         ruleCounters.remove(ruleId);
     }
@@ -53,7 +73,7 @@ public class StatsService {
 
         List<StatsDto.ProductStat> stats = ruleCounters.entrySet().stream()
                 .map(entry -> new StatsDto.ProductStat(entry.getKey().toString(), entry.getValue()))
-                .collect(Collectors.toList());
+                .toList();
 
         return new StatsDto(stats);
     }

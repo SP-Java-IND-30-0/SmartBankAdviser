@@ -8,7 +8,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-
+/**
+ * Правило для сравнения суммы депозитов и выводов для определённого типа продукта.
+ * Расширяет класс RuleArguments.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "rule_compare_operation_sum",
@@ -19,12 +22,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RuleCompareOperationSum extends RuleArguments {
-
+    /**
+     * Тип продукта для сравнения.
+     */
     @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
+    /**
+     * Тип сравнения.
+     */
     @Enumerated(EnumType.ORDINAL)
     private CompareType compareType;
 
+    /**
+     * Конструктор для создания правила из списка аргументов.
+     * @param arguments
+     */
     public RuleCompareOperationSum(List<String> arguments) {
         super();
         if (arguments == null || arguments.size() != 2) {

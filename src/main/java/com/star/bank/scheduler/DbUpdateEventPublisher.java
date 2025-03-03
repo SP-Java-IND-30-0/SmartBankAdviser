@@ -14,6 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Компонент для периодической публикации событий обновления базы данных.
+ * Использует планировщик для запуска публикации событий с случайной задержкой.
+ */
 @Component
 public class DbUpdateEventPublisher {
 
@@ -23,14 +27,27 @@ public class DbUpdateEventPublisher {
 
     private final RecommendationService recommendationService;
 
+    /**
+     * Список идентификаторов пользователей для случайного выбора при публикации событий.
+     */
     @Getter
     private List<UUID> userIds;
 
+    /**
+     * Конструктор для инициализации компонента.
+     *
+     * @param eventPublisher       Публикатор событий приложения.
+     * @param recommendationService Сервис для работы с рекомендациями.
+     */
     public DbUpdateEventPublisher(ApplicationEventPublisher eventPublisher, RecommendationService recommendationService) {
         this.eventPublisher = eventPublisher;
         this.recommendationService = recommendationService;
     }
 
+    /**
+     * Инициализирует компонент после создания.
+     * Загружает список идентификаторов пользователей и запускает планировщик событий.
+     */
     @PostConstruct
     public void init() {
         userIds = recommendationService.getAllUserIds();

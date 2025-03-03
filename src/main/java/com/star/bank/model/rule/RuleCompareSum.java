@@ -9,7 +9,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-
+/**
+ * Правило для сравнения суммы транзакций по определённому типу продукта и операции.
+ * Расширяет класс RuleArguments.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "rule_compare_sum",
@@ -21,14 +24,31 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleCompareSum extends RuleArguments {
 
+    /**
+     * Тип продукта для сравнения.
+     */
     @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
+    /**
+     * Тип операции для сравнения.
+     */
     @Enumerated(EnumType.ORDINAL)
     private OperationType operationType;
+    /**
+     * Тип сравнения для суммы.
+     */
     @Enumerated(EnumType.ORDINAL)
     private CompareType compareType;
+    /**
+     * Сумма для сравнения.
+     */
     private int amount;
 
+    /**
+     * Конструктор для создания правила из списка аргументов.
+     *
+     * @param arguments Список аргументов.
+     */
     public RuleCompareSum(List<String> arguments) {
         super();
         if (arguments == null || arguments.size() != 4) {
@@ -43,6 +63,7 @@ public class RuleCompareSum extends RuleArguments {
             throw new InvalidQueryArgumentsException(QueryType.TRANSACTION_SUM_COMPARE, arguments);
         }
     }
+
 
     @Override
     public String getSubQuery() {

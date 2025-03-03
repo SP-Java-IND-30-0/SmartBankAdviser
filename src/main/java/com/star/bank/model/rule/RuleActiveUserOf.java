@@ -11,7 +11,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+/**
+ * Правило для проверки активности пользователя по определённому типу продукта.
+ * Расширяет класс RuleArguments.
+ */
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "rule_active_user_of",
@@ -22,6 +25,9 @@ import java.util.List;
 @AllArgsConstructor
 public class RuleActiveUserOf extends RuleArguments {
 
+    /**
+     * Тип продукта, который должен использовать активный пользователь.
+     */
     @Enumerated(EnumType.ORDINAL)
     private BankProductType productType;
 
