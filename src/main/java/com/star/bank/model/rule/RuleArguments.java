@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-
+/**
+ * Базовый класс для аргументов правил.
+ * Определяет общую структуру для всех типов правил.
+ */
 @Entity
 @Table(name = "rule_arguments")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -17,5 +20,10 @@ public abstract class RuleArguments implements Rule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    /**
+     * Преобразует аргументы правила в список строк.
+     *
+     * @return Список строковых представлений аргументов.
+     */
     public abstract List<String> convertToList();
 }

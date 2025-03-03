@@ -2,7 +2,6 @@ package com.star.bank.listener;
 
 import com.star.bank.event.DbUpdateEvent;
 import com.star.bank.service.CacheService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,10 +22,6 @@ class CacheEventListenerTest {
 
     @InjectMocks
     private CacheEventListener cacheEventListener;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void test_clearCache() {

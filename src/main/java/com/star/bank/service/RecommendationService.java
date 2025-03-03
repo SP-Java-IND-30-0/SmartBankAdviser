@@ -21,7 +21,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-
+/**
+ * Сервис для формирования персонализированных рекомендаций для пользователей.
+ * Предоставляет методы для отправки рекомендаций по идентификатору пользователя и имени пользователя в Telegram.
+ */
 @Service
 public class RecommendationService {
     private final RecommendationRepository repository;
@@ -31,7 +34,15 @@ public class RecommendationService {
     @Getter
     private final Set<Product> products;
 
-
+    /**
+     * Конструктор для инициализации сервиса.
+     *
+     * @param repository         Репозиторий для работы с рекомендациями.
+     * @param dynamicRuleService Сервис для работы с динамическими правилами.
+     * @param dynamicRuleMapper  Маппер для преобразования динамических правил.
+     * @param eventPublisher     Публикатор событий приложения.
+     * @param products           Набор продуктов для рекомендаций.
+     */
     public RecommendationService(RecommendationRepository repository, DynamicRuleService dynamicRuleService, DynamicRuleMapper dynamicRuleMapper, ApplicationEventPublisher eventPublisher, Set<Product> products) {
         this.repository = repository;
         this.dynamicRuleService = dynamicRuleService;
@@ -40,6 +51,13 @@ public class RecommendationService {
         this.products = products;
     }
 
+    /**
+     * Асинхронно формирует и отправляет персонализированные рекомендации для пользователя по его идентификатору.
+     *
+     * @param userId Идентификатор пользователя.
+     * @return CompletableFuture с DTO персонализированных рекомендаций.
+     * @throws UserNotFoundException Если пользователь не найден.
+     */
     @Async
     public CompletableFuture<PersonalRecommendationDto> sendRecommendation(String userId) {
 
@@ -59,11 +77,23 @@ public class RecommendationService {
         return CompletableFuture.completedFuture(dto);
     }
 
+    /**
+     * Возвращает список всех идентификаторов пользователей.
+     *
+     * @return Список идентификаторов пользователей.
+     */
     public List<UUID> getAllUserIds() {
         return repository.getAllUserIds();
     }
 
 
+    /**
+     * Асинхронно формирует и отправляет персонализированные рекомендации для пользователя по его имени в Telegram.
+     *
+     * @param username Имя пользователя в Telegram.
+     * @return CompletableFuture с DTO персонализированных рекомендаций для Telegram.
+     * @throws UsernameNotFoundException Если пользователь не найден по имени.
+     */
     @Async
     public CompletableFuture<PersonalRecommendationTgDto> sendRecommendationTg(String username) {
 

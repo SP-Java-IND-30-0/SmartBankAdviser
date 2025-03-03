@@ -11,19 +11,33 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
-
+/**
+ * Динамическое правило, реализующее интерфейс Product.
+ * Содержит набор простых правил и формирует запрос на основе этих правил.
+ */
 @Entity
 @Data
 @NoArgsConstructor
 public class DynamicRule implements Product {
-
+    /**
+     * Идентификатор продукта.
+     */
     @Id
     @JsonIgnore
     private UUID productId;
+    /**
+     * Имя продукта.
+     */
     @JsonIgnore
     private String productName;
+    /**
+     * Описание продукта.
+     */
     @JsonIgnore
     private String productText;
+    /**
+     * Набор простых правил, связанных с динамическим правилом.
+     */
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "dynamic_rules_simple_rules",

@@ -20,6 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Сервис для работы с динамическими правилами.
+ * Предоставляет методы для сохранения, удаления и получения динамических правил.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +34,14 @@ public class DynamicRuleService {
     private final ApplicationEventPublisher eventPublisher;
     private final RuleRepository ruleRepository;
 
+    /**
+     * Удаляет динамическое правило по его идентификатору.
+     *
+     * @param productId Идентификатор продукта, связанного с динамическим правилом.
+     * @throws InvalidProductIdException Если идентификатор продукта неверен.
+     * @throws ProductNotFoundException Если продукт не найден.
+     * @throws DatabaseAccessException Если возникает ошибка доступа к базе данных.
+     */
     @Transactional
     public void deleteDynamicRule(String productId) {
         UUID uuid;
@@ -53,6 +65,14 @@ public class DynamicRuleService {
         }
     }
 
+    /**
+     * Сохраняет динамическое правило.
+     *
+     * @param dynamicRuleDto DTO с данными динамического правила.
+     * @throws IllegalArgumentException Если переданное DTO равно null.
+     * @throws InvalidRuleDataException Если данные правила неверны.
+     * @throws DatabaseSaveException Если возникает ошибка при сохранении в базе данных.
+     */
     @Transactional
     public void saveDynamicRule(DynamicRuleDto dynamicRuleDto) {
         if (dynamicRuleDto == null) {
@@ -81,6 +101,12 @@ public class DynamicRuleService {
         }
     }
 
+    /**
+     * Возвращает список всех динамических правил.
+     *
+     * @return Список DTO с данными динамических правил.
+     * @throws DatabaseAccessException Если возникает ошибка доступа к базе данных.
+     */
     public List<DynamicRuleDto> getDynamicRules() {
         try {
             List<DynamicRule> dynamicRules = dynamicRuleRepository.findAll();
