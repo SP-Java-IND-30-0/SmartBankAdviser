@@ -30,7 +30,7 @@ public class DynamicRuleController {
     @Operation(summary = "Новое динамическое правило для пользователя")
     @ApiResponse(responseCode = "201", description = "Динамическое правило успешно создано")
     @ApiResponse(responseCode = "400", description = "Неверный формат запроса")
-    public ResponseEntity<DynamicRuleDto> saveDynamicRule(@RequestBody @Valid DynamicRuleDto dynamicRuleDto) {
+    public ResponseEntity<DynamicRuleDto> saveDynamicRule(@Valid @RequestBody DynamicRuleDto dynamicRuleDto) {
         dynamicRuleService.saveDynamicRule(dynamicRuleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dynamicRuleDto);
     }
@@ -49,12 +49,8 @@ public class DynamicRuleController {
     @ApiResponse(responseCode = "204", description = "Динамическое правило успешно удалено")
     @ApiResponse(responseCode = "404", description = "Ресурс не найден на сервере")
     public ResponseEntity<Void> deleteDynamicRule(@PathVariable String ruleId) {
-        try {
-            dynamicRuleService.deleteDynamicRule(ruleId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        dynamicRuleService.deleteDynamicRule(ruleId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/stats")

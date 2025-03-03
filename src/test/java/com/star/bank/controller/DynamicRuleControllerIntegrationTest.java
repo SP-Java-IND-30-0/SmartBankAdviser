@@ -21,7 +21,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.star.bank.TestDynamicRule.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -93,7 +95,6 @@ class DynamicRuleControllerIntegrationTest {
         DynamicRuleDto testRule = getTestProduct();
         DynamicRuleDto alwaysFalseRule = getAlwaysFalseProduct();
 
-        alwaysTrueRule.setRules(alwaysTrueRule.getRules() == null ? new HashSet<>() : alwaysTrueRule.getRules());
         testRule.setRules(testRule.getRules() == null ? new HashSet<>() : testRule.getRules());
         alwaysFalseRule.setRules(alwaysFalseRule.getRules() == null ? new HashSet<>() : alwaysFalseRule.getRules());
 
@@ -101,14 +102,34 @@ class DynamicRuleControllerIntegrationTest {
         service.saveDynamicRule(alwaysFalseRule);
         service.saveDynamicRule(testRule);
 
+        List<DynamicRuleDto> rulesInDb = dynamicRuleService.getDynamicRules();
+        Assertions.assertEquals(3, rulesInDb.size(), "Количество правил в БД не совпадает с ожиданиями");
+
+        List<String> dbNames = rulesInDb.stream()
+                .map(DynamicRuleDto::getProductName)
+                .toList();
+
+        Assertions.assertTrue(dbNames.contains(alwaysTrueRule.getProductName()), "В БД отсутствует alwaysTrueRule");
+        Assertions.assertTrue(dbNames.contains(testRule.getProductName()), "В БД отсутствует testRule");
+        Assertions.assertTrue(dbNames.contains(alwaysFalseRule.getProductName()), "В БД отсутствует alwaysFalseRule");
+
         String url = "http://localhost:" + port + "/rule";
+        ResponseEntity<DynamicRuleDto[]> response = restTemplate.getForEntity(url, DynamicRuleDto[].class);
 
-        ResponseEntity<DynamicRuleDto[]> response = restTemplate
-                .getForEntity(url, DynamicRuleDto[].class);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "Неверный статус-код ответа");
 
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
-        assertTrue(response.getBody().length > 0);
+        Assertions.assertNotNull(response.getBody(), "Ответ API пустой");
+
+        DynamicRuleDto[] responseBody = response.getBody();
+        Assertions.assertEquals(3, responseBody.length, "Количество правил в API-ответе не совпадает с ожиданиями");
+
+        List<String> returnedNames = Arrays.stream(responseBody)
+                .map(DynamicRuleDto::getProductName)
+                .toList();
+
+        Assertions.assertTrue(returnedNames.contains(alwaysTrueRule.getProductName()), "Ответ API не содержит alwaysTrueRule");
+        Assertions.assertTrue(returnedNames.contains(testRule.getProductName()), "Ответ API не содержит testRule");
+        Assertions.assertTrue(returnedNames.contains(alwaysFalseRule.getProductName()), "Ответ API не содержит alwaysFalseRule");
     }
 
     @Test
@@ -166,10 +187,10 @@ class DynamicRuleControllerIntegrationTest {
 
         String url = "http://localhost:" + port + "/rule";
 
-        ResponseEntity<DynamicRuleDto> responseEntity = restTemplate
-                .postForEntity(url, dynamicRuleDto, DynamicRuleDto.class);
+        ResponseEntity<String> responseEntity = restTemplate
+                .postForEntity(url, dynamicRuleDto, String.class);
 
-        assertThat(responseEntity.getStatusCode(), is(HttpStatus.INTERNAL_SERVER_ERROR));
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
     @Test
