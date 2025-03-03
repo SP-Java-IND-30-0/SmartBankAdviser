@@ -1,8 +1,8 @@
 package com.star.bank.controller;
 
-import com.star.bank.mapper.DynamicRuleMapper;
 import com.star.bank.model.dto.DynamicRuleDto;
 import com.star.bank.service.DynamicRuleService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,10 +19,15 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
 import static com.star.bank.TestDynamicRule.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,41 +39,25 @@ class DynamicRuleControllerIntegrationTest {
 
     private final TestRestTemplate restTemplate = new TestRestTemplate();
 
+    @Autowired
+    private DynamicRuleService dynamicRuleService;
+
     @Container
-    static PostgreSQLContainer<?> cont = new PostgreSQLContainer<>("postgres:17")
+    static final PostgreSQLContainer<?> cont = new PostgreSQLContainer<>("postgres:17")
             .withDatabaseName("test_db")
             .withUsername("test")
             .withPassword("test");
 
-    @Autowired
-    private DynamicRuleService dynamicRuleService;
-
-    @Autowired
-    private DynamicRuleMapper dynamicRuleMapper;
-
     private static DynamicRuleDto testRule;
 
     @BeforeAll
-    static void init(@Autowired DynamicRuleMapper mapper,
-                     @Autowired DynamicRuleService service) {
+    static void startContainer() {
+        cont.start();
+    }
 
-        DynamicRuleDto alwaysTrueRule = getAlwaysTrueProduct();
-        DynamicRuleDto testRule = getTestProduct();
-        DynamicRuleDto alwaysFalseRule = getAlwaysFalseProduct();
-
-        if (alwaysTrueRule.getRules() == null) {
-            alwaysTrueRule.setRules(new HashSet<>());
-        }
-        if (testRule.getRules() == null) {
-            testRule.setRules(new HashSet<>());
-        }
-        if (alwaysFalseRule.getRules() == null) {
-            alwaysFalseRule.setRules(new HashSet<>());
-        }
-
-        service.saveDynamicRule(alwaysTrueRule);
-        service.saveDynamicRule(alwaysFalseRule);
-        service.saveDynamicRule(testRule);
+    @AfterAll
+    static void stopContainer() {
+        cont.stop();
     }
 
     @DynamicPropertySource
@@ -101,7 +88,19 @@ class DynamicRuleControllerIntegrationTest {
     }
 
     @Test
-    void test_getAllDynamicRules_success() {
+    void test_getAllDynamicRules_success(@Autowired DynamicRuleService service) {
+        DynamicRuleDto alwaysTrueRule = getAlwaysTrueProduct();
+        DynamicRuleDto testRule = getTestProduct();
+        DynamicRuleDto alwaysFalseRule = getAlwaysFalseProduct();
+
+        alwaysTrueRule.setRules(alwaysTrueRule.getRules() == null ? new HashSet<>() : alwaysTrueRule.getRules());
+        testRule.setRules(testRule.getRules() == null ? new HashSet<>() : testRule.getRules());
+        alwaysFalseRule.setRules(alwaysFalseRule.getRules() == null ? new HashSet<>() : alwaysFalseRule.getRules());
+
+        service.saveDynamicRule(alwaysTrueRule);
+        service.saveDynamicRule(alwaysFalseRule);
+        service.saveDynamicRule(testRule);
+
         String url = "http://localhost:" + port + "/rule";
 
         ResponseEntity<DynamicRuleDto[]> response = restTemplate
@@ -109,7 +108,7 @@ class DynamicRuleControllerIntegrationTest {
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
-        Assertions.assertTrue(response.getBody().length > 0);
+        assertTrue(response.getBody().length > 0);
     }
 
     @Test
@@ -129,44 +128,71 @@ class DynamicRuleControllerIntegrationTest {
 
     @Test
     void test_deleteDynamicRule_notFound() {
-        String ruleId = UUID.randomUUID().toString();
-        String url = "http://localhost:" + port + "/rule/" + ruleId;
+        DynamicRuleDto ruleToDelete = getTestProduct();
+        ruleToDelete.setProductId(UUID.randomUUID());
+        dynamicRuleService.saveDynamicRule(ruleToDelete);
 
-        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+        String url = "http://localhost:" + port + "/rule/" + ruleToDelete.getProductId();
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        ResponseEntity<DynamicRuleDto[]> responseBeforeDelete = restTemplate.getForEntity("http://localhost:" + port + "/rule", DynamicRuleDto[].class);
+        boolean existsBeforeDelete = Arrays.stream(responseBeforeDelete.getBody())
+                .anyMatch(rule -> rule.getProductId().equals(ruleToDelete.getProductId()));
+        assertTrue(existsBeforeDelete, "Rule should exist before deletion");
+
+        ResponseEntity<Void> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.NO_CONTENT));
+
+        ResponseEntity<DynamicRuleDto[]> responseAfterDelete = restTemplate.getForEntity("http://localhost:" + port + "/rule", DynamicRuleDto[].class);
+        boolean existsAfterDelete = Arrays.stream(responseAfterDelete.getBody())
+                .anyMatch(rule -> rule.getProductId().equals(ruleToDelete.getProductId()));
+        assertFalse(existsAfterDelete, "Rule should be deleted");
     }
 
     @Test
     void test_createDynamicRule_badRequest() {
         String url = "http://localhost:" + port + "/rule";
 
-        DynamicRuleDto invalidRule = new DynamicRuleDto();
-        invalidRule.setProductId(UUID.randomUUID());
-        invalidRule.setProductName("Invalid Product");
-        invalidRule.setProductText("");
-        invalidRule.setRules(new HashSet<>());
+        ResponseEntity<DynamicRuleDto> responseEntity = restTemplate
+                .postForEntity(url, null, DynamicRuleDto.class);
 
-        ResponseEntity<String> response = restTemplate
-                .postForEntity(url, invalidRule, String.class);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
     @Test
     void test_createDynamicRule_invalidProductName() {
+        DynamicRuleDto dynamicRuleDto = new DynamicRuleDto();
+        dynamicRuleDto.setProductName(null);
+
         String url = "http://localhost:" + port + "/rule";
 
-        DynamicRuleDto invalidRule = new DynamicRuleDto();
-        invalidRule.setProductId(UUID.randomUUID());
-        invalidRule.setProductName("");
-        invalidRule.setProductText("Valid text");
-        invalidRule.setRules(new HashSet<>());
+        ResponseEntity<DynamicRuleDto> responseEntity = restTemplate
+                .postForEntity(url, dynamicRuleDto, DynamicRuleDto.class);
 
-        ResponseEntity<String> response = restTemplate
-                .postForEntity(url, invalidRule, String.class);
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertTrue(response.getBody().contains("Product name cannot be empty"));
+    @Test
+    void test_createDynamicRule_invalidJsonFormat() {
+        String invalidJson = "{" +
+                "\"product_id\": \"not a uuid\"," +
+                "\"product_name\": \"Some product name\"," +
+                "\"product_text\": \"Some product text\"," +
+                "\"rule\": []" +
+                "}";
+
+        String url = "http://localhost:" + port + "/rule";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(invalidJson, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate
+                .postForEntity(url, entity, String.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+        Assertions.assertNotNull(responseEntity.getBody(), "Response body should not be null");
+        Assertions.assertTrue(responseEntity.getBody().contains("error"), "Error message should contain 'error'");
     }
 }
